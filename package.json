@@ -1,7 +1,7 @@
 {
   "name": "summitwar-second",
   "version": "1.0.0",
-  "description": "SummitWar: a community-voted weekly indie app tournament",
+  "description": "SummitWar: a community-voted daily indie app tournament",
   "scripts": {
     "test": "vitest run",
     "dev": "next dev",

@@ -1,5 +1,5 @@
-export const ROUND_HOURS = [24, 16, 8] as const;
-export const SPOTLIGHT_HOURS = 120;
+export const ROUND_HOURS = [4, 4, 4] as const;
+export const SPOTLIGHT_HOURS = 12;
 export function editionFee(edition: number) { if (!Number.isInteger(edition) || edition < 1) throw new Error('Invalid edition'); return edition === 1 ? 0 : 500; }
 export function roundWindow(start: string, round: number) { if (round < 1 || round > 3) throw new Error('Invalid round'); const base = Date.parse(start); const hours = ROUND_HOURS.slice(0, round - 1).reduce<number>((a,b)=>a+b,0); return { starts: new Date(base + hours*3600000), ends: new Date(base + (hours+ROUND_HOURS[round-1])*3600000) }; }
 export function normalizeUrl(value: string) { const u = new URL(value); if (!['https:','http:'].includes(u.protocol) || u.username || u.password || u.hostname === 'localhost' || /^(127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.)/.test(u.hostname) || u.hostname.includes(':') || !u.hostname.includes('.')) throw new Error('Use a public HTTP or HTTPS URL'); u.hash=''; u.search=''; u.hostname=u.hostname.toLowerCase().replace(/^www\./,''); u.pathname=u.pathname.replace(/\/+$/,'') || '/'; return u.toString(); }

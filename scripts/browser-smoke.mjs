@@ -9,6 +9,8 @@ const page=await context.newPage();const errors=[];page.on('pageerror',error=>er
 const check=(condition,message)=>{if(!condition)throw new Error(message)};
 await page.goto(base,{waitUntil:'networkidle'});await page.getByRole('heading',{name:'The next summit is yours.'}).waitFor();
 check(await page.locator('.bracket-balanced > .round').count()===5,'Balanced bracket needs five columns');
+check(await page.locator('.bracket-balanced .round > .eyebrow span').allTextContents().then(labels=>labels.length===5&&labels.every(label=>label==='4h')),'Daily rounds should each show four hours');
+check(await page.getByText('4h quarterfinals / 4h semifinals / 4h final · 12h winner spotlight',{exact:true}).count()===1,'Daily schedule legend missing');
 check(await page.locator('.quarter-left .match-slot').count()===2&&await page.locator('.quarter-right .match-slot').count()===2,'Quarterfinal cards missing');
 check(await page.locator('.hero').count()===0,'Homepage hero must be removed');
 check(await page.locator('header a').count()===1,'Header should contain only the project brand');
