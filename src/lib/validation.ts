@@ -5,3 +5,4 @@ const url=z.string().transform((v,ctx)=>{try{normalizeUrl(v);return new URL(v).t
 const media=z.string().url().refine(v=>{try{normalizeUrl(v);return new URL(v).protocol==='https:'}catch{return false}},'Use a public HTTPS media URL');
 export const productSchema=z.object({name:text(80),url,logo_url:media,category:text(60),tagline:text(180),audience:text(1000),problem:text(1500),pricing:text(250),free_trial:z.boolean(),screenshot_url:media,demo_url:media,founder:text(80),x_handle:z.string().trim().max(16).regex(/^@?[a-zA-Z0-9_]*$/).optional(),question:text(300),offer_url:z.union([url,z.literal('')]).optional()});
 export const uuid=z.string().uuid();
+export const submissionSchema=z.object({name:text(80),url,category:text(60),founder:text(80),x_handle:z.string().trim().max(16).regex(/^@?[a-zA-Z0-9_]*$/).optional()});

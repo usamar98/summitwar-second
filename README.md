@@ -15,7 +15,7 @@ Open http://localhost:3000. Without credentials the public design, rules, empty 
 ## Supabase setup
 
 1. Create a Supabase project. Set its URL, publishable key, and server-only service role key in `.env.local`.
-2. Apply `supabase/migrations/20261011160707_summitwar.sql` through Supabase's SQL editor or your established migration pipeline. `supabase/schema.sql` is the same source, retained for local database tests; apply **one**, not both. Run `node scripts/sync-schema.mjs` after changing the schema before deployment.
+2. Apply both migrations in filename order: `20261011160707_summitwar.sql`, then `20261011172940_simplify_submissions.sql`. Existing installations apply only the new migration. The source equivalents are `supabase/schema.sql` and `supabase/submission-upgrade.sql`; do not also apply the sources. Run `node scripts/sync-schema.mjs` after schema changes.
 3. Apply `supabase/storage.sql` to create the public `product-media` bucket. Only the authenticated server upload route writes to it; browser roles receive read access. Images are limited to 5 MB and video demos to 30 MB. The route checks MIME types and file signatures. Demo duration is validated locally and reviewed by the organizer before approval. SVG uploads and arbitrary embeds are excluded.
 4. Enable email magic links and GitHub OAuth in Supabase Auth. Set Site URL to your application origin and allow `/auth/callback`. The default PKCE email link works with the callback code. If customizing the template to use token hashes, use `/auth/callback?token_hash={{ .TokenHash }}`. Keep email confirmation enabled and configure provider abuse/rate limits.
 5. Sign in once and assign the organizer role using trusted SQL:
@@ -25,6 +25,12 @@ insert into public.admin_roles(user_id) values ('YOUR-AUTH-USER-UUID');
 ```
 
 Admins are checked against this table, never user-editable metadata. In `/admin`, create a draft, then publish it. The database assigns immutable edition numbers at publication: global edition #1 is free; all later editions cost 500 cents USD. Draft deletion or cancellation cannot reset the edition counter. Do not manually reset that counter.
+
+## Submission and tournament experience
+
+The homepage opens directly with the balanced tournament bracket. Empty places link to submission; occupied places cannot be claimed twice. Eight founders can enter one app each. Submission asks for website, name, category, founder and optional X handle. The server fetches the website tagline and favicon, validates public DNS and every redirect, pins socket DNS, and bounds request time and response size. Metadata preview lookups are account rate limited. Missing metadata is shown honestly.
+
+The first edition skips payment. Later editions open $5 Checkout on Submit, reserve a specific place for up to 60 minutes, and require organizer review before publishing or voting. Rejection/waitlisting queues a refund. Slot claims and payments use tournament row locks; a delayed payment cannot take another founder’s occupied place. Participant rows show the active round and valid votes, progressing from eight apps to four, two, then the champion. A verified account can cast one final vote per match; founders cannot vote in their own match.
 
 ## Stripe setup
 
