@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 fs.copyFileSync('supabase/schema.sql','supabase/migrations/20261011160707_summitwar.sql');
 if(fs.existsSync('supabase/submission-upgrade.sql'))fs.copyFileSync('supabase/submission-upgrade.sql','supabase/migrations/20261011172940_simplify_submissions.sql');
+if(fs.existsSync('supabase/visitor-presence.sql'))fs.copyFileSync('supabase/visitor-presence.sql','supabase/migrations/20261011184518_visitor_presence.sql');
 const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
 const lock=JSON.parse(fs.readFileSync('package-lock.json','utf8'));
 lock.packages[''].dependencies=pkg.dependencies;

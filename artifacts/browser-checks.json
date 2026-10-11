@@ -6,8 +6,15 @@
     "390×844"
   ],
   "checks": [
+    "brand-only header",
+    "war favicon",
+    "visitor counters",
+    "balanced bracket",
     "empty states",
-    "navigation",
+    "sidebar right-edge position",
+    "sidebar selected place",
+    "sidebar Escape and focus restoration",
+    "sidebar scroll lock and reopen",
     "anonymous dashboard redirect",
     "cron authorization",
     "origin validation",
@@ -18,6 +25,8 @@
   ],
   "screenshots": [
     "artifacts/home-desktop.png",
-    "artifacts/home-mobile.png"
+    "artifacts/home-mobile.png",
+    "artifacts/submission-sidebar-mobile.png",
+    "artifacts/submission-sidebar-desktop.png"
   ]
 }

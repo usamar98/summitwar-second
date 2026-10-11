@@ -3,7 +3,7 @@ import {ArrowTopRightIcon,TriangleUpIcon} from '@radix-ui/react-icons';
 import type {Product} from '@/lib/types';
 import {SiteLogo} from './site-logo';
 export {Bracket} from './bracket';
-export function Logo(){return <Link href="/" className="brand"><TriangleUpIcon width="28" height="28"/><span>summitwar<span className="brand-dot">.</span></span></Link>}
+export function Logo(){return <Link href="/" className="brand" aria-label="SummitWar home"><img className="war-mark" src="/war-logo.svg" width="38" height="38" alt=""/><span>summitwar<span className="brand-dot">.</span></span></Link>}
 export function SectionTitle({eyebrow,title,children}:{eyebrow:string;title:string;children?:React.ReactNode}){return <div className="section-head"><div><p className="eyebrow">{eyebrow}</p><h2>{title}</h2></div>{children}</div>}
 export function Empty({title,body,href,label}:{title:string;body:string;href?:string;label?:string}){return <div className="empty"><TriangleUpIcon width="32" height="32"/><h3>{title}</h3><p>{body}</p>{href&&<Link className="button secondary" href={href}>{label}<ArrowTopRightIcon/></Link>}</div>}
 export function ProductCard({product,priority}:{product:Product;priority?:number|null}){return <Link className="product-card" href={`/products/${product.slug}`}><div className="product-card-top"><SiteLogo src={product.logo_url} name={product.name}/><span className="tag">{product.category}</span><ArrowTopRightIcon/></div><h3>{product.name}</h3><p>{product.tagline||'This website does not publish a tagline.'}</p><div className="card-foot"><span>by {product.founder}</span><span>{priority?`Tie priority ${priority}`:'Explore app'}</span></div></Link>}
