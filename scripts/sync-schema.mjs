@@ -3,6 +3,7 @@ fs.copyFileSync('supabase/schema.sql','supabase/migrations/20261011160707_summit
 if(fs.existsSync('supabase/submission-upgrade.sql'))fs.copyFileSync('supabase/submission-upgrade.sql','supabase/migrations/20261011172940_simplify_submissions.sql');
 if(fs.existsSync('supabase/visitor-presence.sql'))fs.copyFileSync('supabase/visitor-presence.sql','supabase/migrations/20261011184518_visitor_presence.sql');
 if(fs.existsSync('supabase/daily-tournaments.sql'))fs.copyFileSync('supabase/daily-tournaments.sql','supabase/migrations/20261011190335_daily_tournaments.sql');
+if(fs.existsSync('supabase/community-features.sql'))fs.copyFileSync('supabase/community-features.sql','supabase/migrations/20261011195958_community_features.sql');
 const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
 const lock=JSON.parse(fs.readFileSync('package-lock.json','utf8'));
 lock.packages[''].dependencies=pkg.dependencies;

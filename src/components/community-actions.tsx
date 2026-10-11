@@ -1,0 +1,6 @@
+'use client';
+import Link from 'next/link';
+import {useState} from 'react';
+import {useRouter} from 'next/navigation';
+import {command} from './forms';
+export function CommunityActions({product,signedIn,following=false,saved=false}:{product:string;signedIn:boolean;following?:boolean;saved?:boolean}){const router=useRouter();const [follow,setFollow]=useState(following),[save,setSave]=useState(saved),[busy,setBusy]=useState(false),[error,setError]=useState('');async function toggle(action:'follow'|'save'){setBusy(true);setError('');const enabled=action==='follow'?!follow:!save;try{await command({action,product,enabled});if(action==='follow')setFollow(enabled);else setSave(enabled);router.refresh()}catch(e){setError((e as Error).message)}finally{setBusy(false)}}if(!signedIn)return <Link className="text-link" href="/login">Sign in to follow or save ↗</Link>;return <div className="community-actions"><button className="button secondary" disabled={busy} aria-pressed={follow} onClick={()=>toggle('follow')}>{follow?'Following · In-app reminders':'Follow app'}</button><button className="button secondary" disabled={busy} aria-pressed={save} onClick={()=>toggle('save')}>{save?'Saved to collection':'Save app'}</button><small role="alert" className="form-error">{error}</small></div>}

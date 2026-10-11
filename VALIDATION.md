@@ -1,12 +1,30 @@
 # Completed local checks
 
+## Community feature update
+
+- Standalone TypeScript checking passed after the update.
+- Seven focused tests passed for participant colors, screenshot resource restrictions/cleanup, and vote challenge/network hashing.
+- `scripts/verify-community.mjs` applied all five SQL sources in embedded Postgres and passed checks for ownership, saves/follows, founder replies, opening/closing reminder deduplication, unfollowing, final votes, network risk flags, live revisions, screenshot leases, and access restrictions.
+- Full production build passed, including TypeScript and all route generation. Earlier attempts failed due host memory; the successful run used a 128 MB Node heap and one Go compiler processor after stopping the development server.
+- Full Vitest database execution remains limited by host memory. The separate embedded Postgres runner and seven focused tests passed; a passing full regression run is not claimed for this update.
+- Production desktop/mobile smoke checks passed on eight pages. Added checks verify the enlarged bracket, eight distinct place colors, and tomorrow’s lineup. Updated screenshots in `artifacts/` show the current design. Drawer behavior, mobile overflow and page error checks also passed.
+- Hosted screenshot upload, Turnstile, and scheduled in-app notifications still require configured services and deployment validation. No new email delivery was implemented.
+
+Low-memory database runner:
+
+```powershell
+node --liftoff-only --no-wasm-tier-up --wasm-num-compilation-tasks=1 --max-old-space-size=128 scripts/verify-community.mjs
+```
+
+## Earlier daily-tournament checks
+
 - Production Next.js build passed, including TypeScript checking and all application/image/API routes.
 - 50 tests passed: 24 database/rules checks, 7 Stripe signature/provider/refund checks, 8 website metadata/security checks, 3 participant progression checks, 4 visitor-presence checks, and 4 daily scheduling checks.
 - Browser smoke checks passed on 8 pages at desktop 1440×1000 and mobile 390×844.
 - Verified the balanced bracket, brand-only header, war favicon, visitor indicators, five-field submission sidebar at the right desktop edge, selected place, Escape and focus restoration, background scroll lock, reopening with a different place, honest empty states, anonymous dashboard redirect, protected scheduler, origin checks, unsigned webhook rejection, disabled unconfigured submissions, and no page JavaScript errors.
 - Homepage and rules had no horizontal overflow on mobile. Reduced-motion mode was exercised on the application page.
 
-Screenshots and machine-readable results are in `artifacts/`. The local server runs at http://localhost:3000.
+Earlier screenshots and machine-readable results are in `artifacts/`.
 
 ## Still requires configured services
 

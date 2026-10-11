@@ -1,5 +1,1 @@
-import Link from 'next/link';
-import {db,configured} from '@/lib/supabase';
-import {availability} from '@/lib/data';
-import {LocalTime} from './widgets';
-export async function NextEdition(){if(!configured())return null;const {data:t}=await db().from('tournaments').select('id,edition,theme,fee_amount_cents,registration_ends').eq('status','registration').gt('registration_ends',new Date().toISOString()).order('edition').limit(1).maybeSingle();if(!t)return null;const seats=await availability(t.id);return <section className="section"><div className="panel row" style={{justifyContent:'space-between'}}><div><p className="eyebrow">APPLICATIONS OPEN · EDITION #{t.edition}</p><h3>{t.theme}</h3><p>{seats.confirmed}/8 confirmed · {seats.reserved} reserved · {seats.available} available</p><p>Registration closes <LocalTime value={t.registration_ends}/></p></div><Link className="button" href="/submit">{t.fee_amount_cents===0?'Enter free — inaugural tournament':'Enter for $5 — one-time tournament fee'} ↗</Link></div></section>}
+export {NextEdition} from './tomorrow-lineup';

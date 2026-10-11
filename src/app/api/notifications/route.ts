@@ -1,0 +1,2 @@
+import {user,db} from '@/lib/supabase';
+export async function GET(){try{const u=await user();if(!u)return Response.json({signedIn:false,unread:0},{headers:{'Cache-Control':'private,no-store'}});const {count,error}=await db().from('notifications').select('id',{count:'exact',head:true}).eq('user_id',u.id).is('read_at',null);if(error)throw error;return Response.json({signedIn:true,unread:count||0},{headers:{'Cache-Control':'private,no-store'}})}catch{return Response.json({error:'Notifications unavailable'},{status:503})}}

@@ -1,0 +1,5 @@
+'use client';
+import {useState} from 'react';
+import {useRouter} from 'next/navigation';
+import {command} from './forms';
+export function FounderReply({feedback}:{feedback:string}){const [open,setOpen]=useState(false),[text,setText]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');const router=useRouter();return open?<form className="founder-reply-form" onSubmit={async e=>{e.preventDefault();setBusy(true);setError('');try{await command({action:'reply',target:feedback,text});setText('');setOpen(false);router.refresh()}catch(e){setError((e as Error).message)}finally{setBusy(false)}}}><label htmlFor={`reply-${feedback}`}>Your founder reply</label><textarea id={`reply-${feedback}`} required minLength={3} maxLength={1500} value={text} onChange={e=>setText(e.target.value)}/><div className="row"><button className="button secondary" disabled={busy}>{busy?'Posting…':'Post reply'}</button><button type="button" className="text-link" onClick={()=>setOpen(false)}>Cancel</button></div><p className="form-error" role="alert">{error}</p></form>:<button className="text-link" onClick={()=>setOpen(true)}>Reply as founder ↗</button>}

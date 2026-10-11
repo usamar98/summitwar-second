@@ -4,7 +4,7 @@ import path from 'node:path';
 const executable=process.env.BROWSER_EXECUTABLE||'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const base=process.env.TEST_BASE_URL||'http://localhost:3000';
 fs.mkdirSync('artifacts',{recursive:true});
-const context=await chromium.launchPersistentContext(path.resolve('.tmp/browser-profile'),{executablePath:executable,headless:true,viewport:{width:1440,height:1000},args:['--disable-gpu','--disable-dev-shm-usage','--no-first-run']});
+const context=await chromium.launchPersistentContext(path.resolve('.tmp/browser-profile-'+Date.now()),{executablePath:executable,headless:true,timeout:30000,viewport:{width:1440,height:1000},args:['--disable-gpu','--disable-dev-shm-usage','--no-first-run']});
 const page=await context.newPage();const errors=[];page.on('pageerror',error=>errors.push(error.message));
 const check=(condition,message)=>{if(!condition)throw new Error(message)};
 await page.goto(base,{waitUntil:'networkidle'});await page.getByRole('heading',{name:'The next summit is yours.'}).waitFor();
@@ -17,7 +17,7 @@ check(await page.locator('header a').count()===1,'Header should contain only the
 check(await page.locator('link[rel="icon"]').getAttribute('href')==='/war-logo.svg','New war logo favicon missing');
 check(await page.getByText('Current visitors',{exact:false}).count()===1&&await page.getByText('All-time visits',{exact:false}).count()===1,'Visitor counters missing');
 check(await page.getByText('The starting lineup is taking shape').count()===1,'Honest empty contender state missing');
-await page.screenshot({path:'artifacts/home-desktop.png',fullPage:true});
+check(await page.locator('.tomorrow-section').count()===1,'Tomorrow lineup missing');const colors=await page.locator('.quarter-left .slot-app, .quarter-right .slot-app').evaluateAll(els=>els.map(el=>el.style.getPropertyValue('--entrant-color')));check(new Set(colors).size===8,'Eight entrant colors required');check((await page.locator('.bracket-balanced').boundingBox()).height>=520,'Bracket should be enlarged');await page.screenshot({path:'artifacts/home-desktop.png',fullPage:true});
 await page.getByRole('link',{name:'Take your place in slot 1',exact:true}).click();const desktopSidebar=page.getByRole('dialog',{name:'Enter the battle.'});await desktopSidebar.getByRole('button',{name:'Place 1',exact:true}).waitFor();await desktopSidebar.evaluate(async el=>{await Promise.all(el.getAnimations().map(animation=>animation.finished))});const bounds=await desktopSidebar.boundingBox();check(bounds&&Math.abs(bounds.x+bounds.width-1440)<2&&bounds.width<=560,'Desktop sidebar must open at the right edge');await page.screenshot({path:'artifacts/submission-sidebar-desktop.png',fullPage:false});await desktopSidebar.getByRole('button',{name:'Close submission sidebar'}).click();await desktopSidebar.waitFor({state:'hidden'});
 for(const route of ['/rules','/tournaments','/hall-of-fame','/submit','/admin','/login']){const response=await page.goto(base+route,{waitUntil:'networkidle'});check(response.status()===200,`${route} failed`);check(await page.locator('h1').count()===1,`${route} needs one h1`);}
 await page.goto(base+'/dashboard',{waitUntil:'networkidle'});check(page.url().endsWith('/login'),'Anonymous dashboard access was not redirected');

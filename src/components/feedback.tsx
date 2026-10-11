@@ -1,4 +1,1 @@
-import {db,user} from '@/lib/supabase';
-import {ActionButton,FeedbackForm} from './forms';
-import Link from 'next/link';
-export async function Feedback({product}:{product:string}){const {data}=await db().from('feedback').select('id,body,created_at').eq('product_id',product).eq('hidden',false).order('created_at',{ascending:false}).limit(50);const u=await user();return <section className="panel"><h3>Useful feedback beats applause.</h3>{u?<FeedbackForm product={product}/>:<p><Link className="text-link" href="/login">Sign in to leave feedback ↗</Link></p>}<div className="feedback-list">{data?.length?data.map(f=><div className="feedback-item" key={f.id}><p>{f.body}</p><small>{new Date(f.created_at).toISOString().slice(0,10)}</small>{u&&<ActionButton payload={{action:'report',feedback:f.id,reason:'Community abuse report'}}>Report abuse</ActionButton>}</div>):<p>No feedback yet. Ask a useful question to start the conversation.</p>}</div></section>}
+export {Feedback} from './feedback-thread';

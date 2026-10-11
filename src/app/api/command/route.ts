@@ -3,6 +3,7 @@ import {requireUser,requireAdmin,rpc,db} from '@/lib/supabase';
 import {submissionSchema,uuid} from '@/lib/validation';
 import {checkout} from '@/lib/payments';
 import {siteMetadata} from '@/lib/site-metadata';
+import {verifyVoteChallenge,voteNetwork} from '@/lib/vote-protection';
 export async function POST(req:Request){
  if(req.headers.get('origin')!==new URL(req.url).origin)return Response.json({error:'Invalid origin'},{status:403});
  try{
@@ -18,7 +19,8 @@ export async function POST(req:Request){
    let checkoutUrl=null,checkoutError=null;if(admission.fee>0&&admission.status==='approved'){try{checkoutUrl=await checkout(admission.entry)}catch(e){checkoutError=e instanceof Error?e.message:'Could not start checkout';}}
    result={...admission,checkoutUrl,checkoutError};
   }
-  else if(body.action==='vote'){if(body.confirm!==true)throw new Error('Confirm your final vote');await rpc('cast_vote',{p_actor:u.id,p_match:uuid.parse(body.match),p_entry:uuid.parse(body.entry)});}
+  else if(body.action==='vote'){if(body.confirm!==true)throw new Error('Confirm your final vote');await verifyVoteChallenge(req,body.challenge);await rpc('cast_protected_vote',{p_actor:u.id,p_match:uuid.parse(body.match),p_entry:uuid.parse(body.entry),p_network:voteNetwork(req,u.id)});}
+  else if(['follow','save','reply','read'].includes(body.action)){if(body.enabled!==undefined&&typeof body.enabled!=='boolean')throw new Error('Invalid preference');await rpc('community_command',{p_actor:u.id,p_action:body.action,p_product:body.product?uuid.parse(body.product):null,p_target:body.target?uuid.parse(body.target):null,p_body:body.action==='reply'?String(body.text||'').trim().slice(0,1500):null,p_enabled:body.enabled!==false});}
   else if(body.action==='feedback'){await rpc('add_feedback',{p_actor:u.id,p_product:uuid.parse(body.product),p_body:String(body.text).trim().slice(0,1500)});}
   else if(body.action==='report'){const {error}=await db().from('reports').insert({user_id:u.id,feedback_id:uuid.parse(body.feedback),reason:String(body.reason).slice(0,500)});if(error)throw error;}
   else if(body.action==='checkout')result=await checkout(uuid.parse(body.entry));

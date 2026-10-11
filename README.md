@@ -15,7 +15,7 @@ Open http://localhost:3000. Without credentials the public design, rules, empty 
 ## Supabase setup
 
 1. Create a Supabase project. Set its URL, publishable key, and server-only service role key in `.env.local`.
-2. Apply migrations in filename order: `20261011160707_summitwar.sql`, `20261011172940_simplify_submissions.sql`, `20261011184518_visitor_presence.sql`, then `20261011190335_daily_tournaments.sql`. Existing installations apply only migrations not already applied. Sources include `supabase/schema.sql`, `supabase/submission-upgrade.sql`, `supabase/visitor-presence.sql`, and `supabase/daily-tournaments.sql`; do not also apply the sources. Run `node scripts/sync-schema.mjs` after schema changes.
+2. Apply migrations in filename order: `20261011160707_summitwar.sql`, `20261011172940_simplify_submissions.sql`, `20261011184518_visitor_presence.sql`, `20261011190335_daily_tournaments.sql`, then `20261011195958_community_features.sql`. Existing installations apply only migrations not already applied. Sources include `supabase/schema.sql`, `supabase/submission-upgrade.sql`, `supabase/visitor-presence.sql`, `supabase/daily-tournaments.sql`, and `supabase/community-features.sql`; do not also apply the sources. Run `node scripts/sync-schema.mjs` after schema changes.
 3. Apply `supabase/storage.sql` to create the public `product-media` bucket. Only the authenticated server upload route writes to it; browser roles receive read access. Images are limited to 5 MB and video demos to 30 MB. The route checks MIME types and file signatures. Demo duration is validated locally and reviewed by the organizer before approval. SVG uploads and arbitrary embeds are excluded.
 4. Enable email magic links and GitHub OAuth in Supabase Auth. Set Site URL to your application origin and allow `/auth/callback`. The default PKCE email link works with the callback code. If customizing the template to use token hashes, use `/auth/callback?token_hash={{ .TokenHash }}`. Keep email confirmation enabled and configure provider abuse/rate limits.
 5. Sign in once and assign the organizer role using trusted SQL:
@@ -36,7 +36,19 @@ The homepage opens directly with the balanced tournament bracket. Empty places l
 
 The first edition skips payment. Later editions open $5 Checkout on Submit, reserve a specific place for up to 60 minutes, and require organizer review before publishing or voting. Rejection/waitlisting queues a refund. Slot claims and payments use tournament row locks; a delayed payment cannot take another founder’s occupied place. Participant rows show the active round and valid votes, progressing from eight apps to four, two, then the champion. A verified account can cast one final vote per match; founders cannot vote in their own match.
 
-## Stripe setup
+## Community features
+
+The enlarged bracket gives each place a distinct color that follows its entrant through subsequent rounds. The tournament and match pages check score revisions every three seconds while visible and refresh their server-rendered content only when the revision changes. Tomorrow’s lineup shows approved apps, reserved places, available places, and its local start time.
+
+Follow an app for **in-app** opening and 30-minute closing reminders. The scheduler deduplicates reminders per user, match, and event; it skips entrants in their own match and users who have voted. Unfollowing stops future reminders. `/notifications` has read/unread state and battle links. No email delivery or email jobs were added. `/collection` stores each signed-in user’s saved apps. Founders can reply to visible feedback on their own published projects; replies show a founder badge and create an in-app notification for the original commenter.
+
+Founder dashboards link to private `/reports/<entry-id>` pages with round votes, results, period views/clicks and feedback, plus a downloadable JSON report. These figures are recorded browser/day events during the reporting period, not conversions or guaranteed attribution. Access requires the entry owner.
+
+For bot challenges, set **both** `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`, configuring the widget for the deployed hostname. Votes validate tokens on the server, including hostname and `vote` action. An incomplete configuration fails closed. Without configured keys, verified identity, final-vote uniqueness, rate limits, and network-pattern flags still apply. `VOTE_RISK_SALT` is a private stable salt; otherwise the service-role key provides it. Network identifiers are HMAC hashes, retained seven days. Four distinct voters sharing a match/network within ten minutes flag the votes for review without automatically invalidating them.
+
+New projects automatically queue website screenshots. The existing protected `/api/cron` worker captures one queued project per run and uploads a PNG to the `product-media` bucket. Apply `supabase/storage.sql` and enable the scheduler. Linux deployments use bundled Chromium; set `SCREENSHOT_BROWSER_PATH` to an installed Chrome executable for local Windows capture. Rendering disables JavaScript, service workers, downloads, and non-GET requests. Every document and resource passes the DNS-pinned public-address fetcher, with request, byte and time limits. Captures show static website content; sites requiring JavaScript or blocking automated retrieval may have incomplete or unavailable previews. Capture failures retry up to three times and never block submission or payment.
+
+## Stripe configuration
 
 Set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` using test credentials first. The installed SDK uses Stripe's current `allowed_payment_method_types: ['card']` filter; Adaptive Pricing is disabled to preserve the exact USD amount. Enable card payments in the Stripe dashboard.
 
@@ -93,7 +105,7 @@ Browser smoke checks (requires installed Chrome, override with `BROWSER_EXECUTAB
 node scripts/browser-smoke.mjs
 ```
 
-The recorded local result is 26 passing tests, a successful production build, and passing desktop/mobile smoke checks on 8 pages. See `VALIDATION.md` and `artifacts/browser-checks.json`.
+The recorded checks and any environment limitations are listed in `VALIDATION.md`. See `VALIDATION.md` and `artifacts/browser-checks.json`.
 
 The database suite runs the actual schema/functions inside PGlite (embedded Postgres) with mocked Supabase auth tables. Provider tests use the Stripe SDK's actual signature verifier and controlled payment/refund mocks. PGlite validates SQL, invariants, admission races as queued concurrent requests, and idempotent commands. It does **not** reproduce multi-connection Postgres contention or hosted Supabase Auth/RLS deployment configuration. Before launch, repeat final-seat contention on your hosted Postgres with independent connections and test Stripe CLI delivery, refunds, GitHub/email login, uploads, and scheduled jobs with real test credentials.
 

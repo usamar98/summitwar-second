@@ -1,0 +1,4 @@
+'use client';
+import Link from 'next/link';
+import {useEffect,useState} from 'react';
+export function CommunityDock(){const [count,setCount]=useState<number|null>(null);useEffect(()=>{let active=true;const controller=new AbortController();async function load(){if(document.hidden)return;try{const r=await fetch('/api/notifications',{signal:controller.signal,cache:'no-store'});if(r.ok){const data=await r.json();if(active)setCount(data.signedIn?data.unread:null)}}catch{}}load();const timer=setInterval(load,30000);return()=>{active=false;controller.abort();clearInterval(timer)}},[]);return <div className="community-dock"><Link href="/collection">Saved apps ↗</Link><Link href="/notifications">In-app reminders{count!==null&&count>0?<span className="unread-count">{count}</span>:null} ↗</Link><Link href="/dashboard">Your results ↗</Link></div>}
