@@ -1,0 +1,9 @@
+import {ImageResponse} from 'next/og';
+import {db,configured} from '@/lib/supabase';
+import {safeCardLogo} from '@/lib/media';
+export async function GET(req:Request,{params}:{params:Promise<{kind:string;id:string}>}){if(!configured())return new Response('Not found',{status:404});const {kind,id}=await params;let title='',subtitle='',logo:string|null=null;
+if(kind==='product'){const {data:p}=await db().from('products').select('name,tagline,logo_url').eq('id',id).eq('published',true).maybeSingle();if(!p)return new Response('Not found',{status:404});title=p.name;subtitle=p.tagline;logo=safeCardLogo(p.logo_url);}
+else if(kind==='tournament'){const {data:t}=await db().from('tournaments').select('theme,edition').eq('id',id).not('edition','is',null).maybeSingle();if(!t)return new Response('Not found',{status:404});title=`Edition #${t.edition}`;subtitle=t.theme;}
+else if(kind==='champion'){const {data:c}=await db().from('champions').select('entry:entries(snapshot)').eq('tournament_id',id).maybeSingle();if(!c)return new Response('Not found',{status:404});const p=(c.entry as unknown as {snapshot:{name:string;logo_url:string}}).snapshot;title=p.name;subtitle='SummitWar champion · The community’s choice';logo=safeCardLogo(p.logo_url);}
+else return new Response('Not found',{status:404});
+return new ImageResponse(<div style={{background:'#152017',color:'#edf0e6',width:'100%',height:'100%',display:'flex',flexDirection:'column',padding:75,fontFamily:'sans-serif'}}><span style={{color:'#d7eb9b',fontSize:30}}>summitwar.</span>{logo&&<img alt="" src={logo} width="80" height="80" style={{marginTop:30}}/>}<strong style={{fontSize:70,marginTop:35}}>{title}</strong><span style={{fontSize:28,color:'#b7c4ae',marginTop:25}}>{subtitle}</span><span style={{fontSize:22,marginTop:'auto',color:'#d7eb9b'}}>8 apps. 48 hours. One champion.</span></div>,{width:1200,height:630});}

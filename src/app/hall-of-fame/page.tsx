@@ -1,0 +1,5 @@
+import Link from 'next/link';
+import {configured,db} from '@/lib/supabase';
+import {Empty,ProductCard} from '@/components/ui';
+export const dynamic='force-dynamic';
+export default async function Hall(){const {data}=configured()?await db().from('champions').select('*,entry:entries(snapshot),tournament:tournaments(edition,theme)').order('spotlight_starts',{ascending:false}):{data:[]};return <div className="page"><p className="eyebrow">THE HALL OF FAME</p><h1>They reached the summit.</h1><p className="lede">Independent apps chosen by the community. Every champion has a permanent place here.</p>{data?.length?<div className="products-grid">{data.map(c=><article key={c.tournament_id}><p className="eyebrow">EDITION #{(c.tournament as unknown as {edition:number}).edition}</p><ProductCard product={(c.entry as unknown as {snapshot:any}).snapshot}/><Link className="text-link" href={`/champions/${c.tournament_id}`}>Result, interview & badge ↗</Link></article>)}</div>:<Empty title="The first summit is still unclaimed" body="Eight apps will battle for the inaugural title. The community decides who gets here." href="/tournaments" label="Explore the tournament"/>}</div>}

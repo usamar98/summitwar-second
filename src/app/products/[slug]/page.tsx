@@ -1,0 +1,9 @@
+import {notFound} from 'next/navigation';
+import Link from 'next/link';
+import {configured,db,user} from '@/lib/supabase';
+import {Pitch} from '@/components/ui';
+import {Feedback} from '@/components/feedback';
+import {Share,TrackView} from '@/components/widgets';
+export const dynamic='force-dynamic';
+export async function generateMetadata({params}:{params:Promise<{slug:string}>}){const {slug}=await params;if(!configured())return {};const {data:p}=await db().from('products').select('id,name,tagline').eq('slug',slug).eq('published',true).maybeSingle();return p?{title:p.name,description:p.tagline,openGraph:{images:[`/api/og/product/${p.id}`]}}:{title:'Product unavailable'};}
+export default async function ProductPage({params}:{params:Promise<{slug:string}>}){const {slug}=await params;if(!configured())notFound();const u=await user();const {data:p}=await db().from('products').select('*').eq('slug',slug).maybeSingle();if(!p||(!p.published&&p.owner_id!==u?.id))notFound();const {data:history}=await db().from('entries').select('id,status,tournament:tournaments(id,edition,status)').eq('product_id',p.id).eq('status','confirmed');return <div className="page"><p className="eyebrow">AN INDEPENDENT APP · {p.published?'PERMANENT PRODUCT PAGE':'PRIVATE APPLICATION PREVIEW'}</p><div className="two-columns"><Pitch product={p}/></div>{p.published&&<><TrackView product={p.id}/><Feedback product={p.id}/></>}<section className="panel"><h3>Tournament history</h3>{history?.length?history.map(e=>{const t=e.tournament as unknown as {id:string;edition:number;status:string};return <p key={e.id}><Link className="text-link" href={`/tournaments/${t.id}`}>Edition #{t.edition} · {t.status} ↗</Link></p>}):<p>Awaiting confirmation for a tournament.</p>}</section><Share title={`${p.name} on SummitWar`} url={`${process.env.NEXT_PUBLIC_APP_URL||'http://localhost:3000'}/products/${slug}`}/></div>}

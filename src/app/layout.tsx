@@ -1,0 +1,6 @@
+import type {Metadata} from 'next';
+import Link from 'next/link';
+import {Logo} from '@/components/ui';
+import './globals.css';
+export const metadata:Metadata={metadataBase:new URL(process.env.NEXT_PUBLIC_APP_URL||'http://localhost:3000'),title:{default:'SummitWar — 8 apps. 48 hours. One champion.',template:'%s · SummitWar'},description:'Ship your app. Enter the battle. Rule the summit. Weekly indie app tournaments chosen by the community.'};
+export default function Layout({children}:{children:React.ReactNode}){return <html lang="en"><body><a className="skip" href="#main">Skip to content</a><header className="nav-shell"><nav className="nav"><Logo/><div className="nav-links"><Link href="/tournaments">The tournament</Link><Link href="/hall-of-fame">Hall of fame</Link><Link href="/rules">How it works</Link></div><Link className="nav-signin" href="/dashboard">Founder dashboard ↗</Link></nav></header><main id="main">{children}</main><footer><Logo/><p>Built for the ones who ship.</p><div><Link href="/rules">Rules & pricing</Link><Link href="/submit">Enter an app</Link><Link href="/admin">Admin</Link></div><small>Community choice. Real feedback. A place on the summit.</small></footer></body></html>}

@@ -1,0 +1,23 @@
+import {chromium} from '@playwright/test';
+import fs from 'node:fs';
+import path from 'node:path';
+const executable=process.env.BROWSER_EXECUTABLE||'C:/Program Files/Google/Chrome/Application/chrome.exe';
+const base=process.env.TEST_BASE_URL||'http://localhost:3000';
+fs.mkdirSync('artifacts',{recursive:true});
+const context=await chromium.launchPersistentContext(path.resolve('.tmp/browser-profile'),{executablePath:executable,headless:true,viewport:{width:1440,height:1000},args:['--disable-gpu','--disable-dev-shm-usage','--no-first-run']});
+const page=await context.newPage();const errors=[];page.on('pageerror',error=>errors.push(error.message));
+const check=(condition,message)=>{if(!condition)throw new Error(message)};
+await page.goto(base,{waitUntil:'networkidle'});await page.getByRole('heading',{name:/8 apps.*48 hours.*One champion/}).waitFor();
+check(await page.getByText('The starting lineup is taking shape').count()===1,'Honest empty contender state missing');
+await page.screenshot({path:'artifacts/home-desktop.png',fullPage:true});
+for(const route of ['/rules','/tournaments','/hall-of-fame','/submit','/admin','/login']){const response=await page.goto(base+route,{waitUntil:'networkidle'});check(response.status()===200,`${route} failed`);check(await page.locator('h1').count()===1,`${route} needs one h1`);}
+await page.goto(base+'/dashboard',{waitUntil:'networkidle'});check(page.url().endsWith('/login'),'Anonymous dashboard access was not redirected');
+const cron=await context.request.get(base+'/api/cron');check(cron.status()===401,'Cron should reject requests without authorization');
+const command=await context.request.post(base+'/api/command',{data:{action:'admin',command:'create'}});check(command.status()===403,'Mutation route must validate origin');
+const webhook=await context.request.post(base+'/api/stripe/webhook',{data:{id:'forged'}});check(webhook.status()===400,'Unsigned webhook must be rejected');
+await page.setViewportSize({width:390,height:844});await page.goto(base,{waitUntil:'networkidle'});check(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),'Mobile page has horizontal overflow');await page.screenshot({path:'artifacts/home-mobile.png',fullPage:true});
+await page.goto(base+'/rules',{waitUntil:'networkidle'});check(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),'Mobile rules have horizontal overflow');
+await page.emulateMedia({reducedMotion:'reduce'});await page.goto(base+'/submit',{waitUntil:'networkidle'});check(await page.getByRole('button',{name:'Submit for review'}).isDisabled(),'Submission must be disabled without auth/tournament');
+check(errors.length===0,`Browser errors: ${errors.join('; ')}`);
+const summary={passed:true,pages:8,viewports:['1440×1000','390×844'],checks:['empty states','navigation','anonymous dashboard redirect','cron authorization','origin validation','unsigned webhook rejection','mobile overflow','disabled unconfigured submission','no page errors'],screenshots:['artifacts/home-desktop.png','artifacts/home-mobile.png']};
+fs.writeFileSync('artifacts/browser-checks.json',JSON.stringify(summary,null,2)+'\n');console.log(JSON.stringify(summary,null,2));await context.close();
