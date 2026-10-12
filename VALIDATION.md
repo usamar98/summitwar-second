@@ -1,5 +1,18 @@
 # Completed local checks
 
+## Extended tournament schedule update
+
+- Production build and standalone TypeScript checking passed.
+- Three clock tests passed for exact round transitions, registration/completed states, and published legacy deadlines.
+- `scripts/verify-extended.mjs` passed actual embedded Postgres checks for 24/24/12-hour rounds, the 12-hour champion spotlight, successor start at 72 hours, idempotent scheduler retries, paid pre-entry, exclusive slot reservations and anonymous access denial.
+- Existing community database checks passed with all six SQL sources, including the new migration.
+- Eight-page desktop/mobile smoke checks passed with the new 24/24/12-hour labels. The watch and pre-entry section were visually inspected; mobile overflow, drawer behavior and page error checks passed.
+- Hosted deployment must apply `20261012191709_extended_tournament_schedule.sql`. Existing locked/running editions preserve their original schedule; new/unlocked editions use the new schedule. No hosted services or live payments were exercised.
+
+```powershell
+node --liftoff-only --no-wasm-tier-up --wasm-num-compilation-tasks=1 --max-old-space-size=128 scripts/verify-extended.mjs
+```
+
 ## Community feature update
 
 - Standalone TypeScript checking passed after the update.

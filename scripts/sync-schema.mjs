@@ -9,3 +9,5 @@ const lock=JSON.parse(fs.readFileSync('package-lock.json','utf8'));
 lock.packages[''].dependencies=pkg.dependencies;
 lock.packages[''].devDependencies=pkg.devDependencies;
 fs.writeFileSync('package-lock.json',JSON.stringify(lock,null,2)+'\n');
+
+fs.copyFileSync('supabase/extended-tournaments.sql','supabase/migrations/20261012191709_extended_tournament_schedule.sql');
