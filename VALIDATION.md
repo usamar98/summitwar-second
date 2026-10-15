@@ -1,5 +1,20 @@
 # Completed local checks
 
+## Email-free guest voting update
+
+- Full Vitest regression suite passed: **74 tests in 13 files**. This includes signed browser identity, token/handle validation, guest API checks, bot verification, and existing payment/database/community behavior.
+- Production build passed with TypeScript and all routes, including `/vote`, `/api/vote` and `/api/vote-link`.
+- `scripts/verify-guest-voting.mjs` applied all seven schema sources in actual embedded Postgres. It checked no new auth accounts, browser binding, token rotation/expiry/reuse, transactional final votes, malformed handles/contenders, founder/account restrictions, score integration, network flags, mint limits, deadlines, anonymous/authenticated table/RPC denial, and privacy cleanup without deleting ballots.
+- Existing community checks passed with all seven schema sources. Embedded Postgres queues concurrent requests; hosted independent-connection contention remains a deployment check.
+- Nine-page desktop/mobile smoke checks passed. The separate guest browser test uses controlled API fixtures for missing links, hash navigation, optional X input, no email field, final confirmation, both choices locking, reload without resubmission, mobile layout and Escape. It does not claim a live CAPTCHA or hosted database flow.
+- Updated vote-dialog screenshots and the fixture scope are saved in `artifacts/guest-voting-browser.json`.
+- Real Turnstile keys, deployed RLS and hosted vote-link issuance remain unverified because this workspace has no `.env.local` credentials. Apply `20261015102148_guest_voting.sql` and configure both Turnstile keys plus a stable `VOTER_COOKIE_SECRET` before enabling live guest voting. Founder/admin authentication remains protected.
+
+```powershell
+node --liftoff-only --no-wasm-tier-up --wasm-num-compilation-tasks=1 --max-old-space-size=128 scripts/verify-guest-voting.mjs
+node scripts/guest-voting-browser.mjs
+```
+
 ## Extended tournament schedule update
 
 - Production build and standalone TypeScript checking passed.

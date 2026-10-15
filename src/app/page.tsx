@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import {votedMatches} from '@/lib/guest-voter';
 import {TournamentWatch} from '@/components/tournament-watch';
 import {ArrowTopRightIcon,CheckIcon,TriangleUpIcon} from '@radix-ui/react-icons';
 import {tournamentData,availability,preview,matchScores} from '@/lib/data';
@@ -11,7 +12,7 @@ export const dynamic='force-dynamic';
 export default async function Home(){
  const [{tournament:t,entries,matches,champion},u]=await Promise.all([tournamentData(),user()]);
  const [seats,scores]=await Promise.all([t?availability(t.id):null,matchScores(matches)]);
- const {data:votes}=u&&matches.length?await db().from('votes').select('match_id').eq('user_id',u.id).in('match_id',matches.map(m=>m.id)):{data:[]};
+ const votes=await votedMatches(matches.map(m=>m.id),u?.id);
  const [follows,saved]=u?await Promise.all([db().from('product_follows').select('product_id').eq('user_id',u.id),db().from('saved_products').select('product_id').eq('user_id',u.id)]):[{data:[]},{data:[]}];
  const live=t?.status==='voting';const spotlight=champion&&Date.parse(champion.spotlight_ends)>Date.now()&&!live;let winner=null;
  if(champion&&configured()){const {data}=await db().from('entries').select('snapshot').eq('id',champion.entry_id).single();winner=data?.snapshot;}
@@ -24,7 +25,7 @@ export default async function Home(){
   {spotlight&&winner&&<div className="spotlight panel"><p className="eyebrow">COMMUNITY CHOICE</p><ProductCard product={winner}/><Link className="text-link" href={`/champions/${champion.tournament_id}`}>Champion story & badge ↗</Link><p>Spotlight ends <LocalTime value={champion.spotlight_ends}/></p></div>}
   {live&&winner&&<div className="historical"><p className="eyebrow">PREVIOUS CHAMPION</p><Link href={`/champions/${champion!.tournament_id}`}>{winner.name} ↗</Link></div>}
  </section>
- <ParticipantList entries={entries} matches={matches} scores={scores} userId={u?.id} votedMatches={votes?.map(v=>v.match_id)||[]} tournamentStatus={t?.status} followedProducts={follows.data?.map(f=>f.product_id)||[]} savedProducts={saved.data?.map(s=>s.product_id)||[]}/>
+ <ParticipantList entries={entries} matches={matches} scores={scores} userId={u?.id} votedMatches={votes} tournamentStatus={t?.status} followedProducts={follows.data?.map(f=>f.product_id)||[]} savedProducts={saved.data?.map(s=>s.product_id)||[]}/>
  <NextEdition currentId={t?.id}/>
  <section className="section how"><div><p className="eyebrow">A SIMPLE PATH TO THE TOP</p><h2>Built it?<br/>Battle it.</h2><p className="muted">Submit your website. Let the community discover it.</p><Link className="text-link" href="/rules">Read the rules <ArrowTopRightIcon/></Link></div><div className="steps">{[['01','Take an open place','Add your website link. Its favicon and tagline are fetched automatically.'],['02','Let the community decide','Eight apps face off in a 60-hour bracket. Every round starts fresh.'],['03','Take the summit','The champion gets 12 hours in the spotlight. Every entrant stays discoverable.']].map(([n,title,body])=><div className="step" key={n}><span>{n}</span><div><h3>{title}</h3><p>{body}</p></div></div>)}</div></section>
  <section className="entry-strip"><div><p className="eyebrow">YOUR NEXT LAUNCH DESERVES AN AUDIENCE</p><h2>Meet you at the summit.</h2><p><CheckIcon/> Permanent product page <CheckIcon/> Community feedback <CheckIcon/> Battle card</p></div><Link className="button" href="/submit">Take your place <ArrowTopRightIcon/></Link></section>

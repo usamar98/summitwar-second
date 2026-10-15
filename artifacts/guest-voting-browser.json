@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "scope": "Controlled API fixtures exercise guest voting UI; actual API and database security are tested separately.",
+  "checks": [
+    "missing link",
+    "no email field",
+    "optional X handle",
+    "final vote payload",
+    "both choices lock",
+    "reload does not vote",
+    "mobile layout",
+    "Escape",
+    "no page errors"
+  ]
+}
