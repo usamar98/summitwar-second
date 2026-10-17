@@ -1,0 +1,16 @@
+.demo-preview-banner{max-width:1560px;width:calc(100% - 48px);margin:24px auto 0;padding:14px 18px;display:flex;align-items:center;gap:18px;border:1px dashed var(--line);border-radius:6px;background:oklch(20% .018 145)}
+.demo-preview-banner>span{font-size:10px;font-weight:650;letter-spacing:1.4px;color:var(--accent);white-space:nowrap}
+.demo-preview-banner>p{font-size:12px;flex:1}
+.demo-preview-banner>a{font-size:11px;color:var(--accent)}
+.demo-preview .summit-hero{padding-top:34px}
+.demo-next-edition{display:flex;align-items:center;justify-content:space-between;gap:40px;border-top:1px solid var(--line);margin-bottom:24px}
+.demo-next-edition h2{font-size:34px;margin:16px 0 18px}
+.demo-next-edition>div>p:last-child{max-width:58ch;font-size:13px;line-height:1.8}
+.demo-next-edition>.button{flex-shrink:0}
+.demo-project-heading{display:flex;align-items:center;gap:18px;margin-top:30px}
+.demo-project-heading img{border-radius:16px}
+.demo-project-heading p{font-size:12px}
+.demo-detail-body{font-size:16px;line-height:1.8;margin:24px 0 14px}
+.demo-example-url{font-size:12px;color:var(--accent);overflow-wrap:anywhere}
+.demo-detail-note{font-size:11px;line-height:1.8;border-top:1px solid var(--line);padding-top:18px;margin-top:24px}
+@media(max-width:650px){.demo-preview-banner{width:calc(100% - 32px);flex-wrap:wrap;gap:8px 14px;margin-top:16px;padding:14px}.demo-preview-banner>p{flex-basis:100%;order:3}.demo-next-edition{flex-direction:column;align-items:flex-start;gap:24px}.demo-next-edition h2{font-size:29px}}
