@@ -1,5 +1,12 @@
 # Completed local checks
 
+## In-page sponsor details
+
+- Sponsor cards use transparent backgrounds, fine 1px white dashed outlines and the centered label **Sponsor by**. Each empty card opens its own details dialog without changing the page URL.
+- The dialog shows the selected position, its exact $70/$50/$30 price and editable startup fields. Its checkout selects that one card; the existing dedicated page still supports multiple-card purchases. Existing payment verification and reservation checks are reused.
+- TypeScript passed. The existing regression tests passed across 21 files: 104 tests in the main run and the remaining four visitor-presence tests on an isolated retry after a local memory failure. A sandbox run was unable to load temporary transformed modules, so the regression run used the normal local runtime.
+- The dialog behavior passed desktop/mobile checks before the final copy cleanup, and all six final desktop dialogs passed exact-price, editable-field, no-navigation, focus-trap and dismissal checks. Local rechecks of the separate promotion page hit corrupted Next.js development manifests and navigation timeouts. Hosted verification is required for the final complete browser check.
+
 ## Simplified sponsor cards
 
 - Empty placements show only their exact price and the centered word **Sponsor**. The whole card is a native booking link, carrying its own slot selection to the startup details form. Reserved placements retain their state label; paid startup details and disclosure remain intact.

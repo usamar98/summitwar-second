@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import {PromotionHero} from '@/components/promotion-hero';
 import {promotionInventory,promotionEnd} from '@/lib/promotions';
+import {stripeCheckoutReady} from '@/lib/stripe-client';
 import {votedMatches} from '@/lib/guest-voter';
 import {TournamentWatch} from '@/components/tournament-watch';
 import {ArrowTopRightIcon,CheckIcon,TriangleUpIcon} from '@radix-ui/react-icons';
@@ -20,7 +21,7 @@ export default async function Home(){
  if(champion&&configured()){const {data}=await db().from('entries').select('snapshot').eq('id',champion.entry_id).single();winner=data?.snapshot;}
  const [promotions,promotionEnds]=await Promise.all([promotionInventory(t?.id),promotionEnd(t?.id)]);
  return <>{preview&&<div className="preview-banner">LOCAL PREVIEW · No real entrants, votes, or payments are simulated.</div>}<LiveRefresh tournament={t?.id}/>
- <PromotionHero winner={winner} championId={champion?.tournament_id} tournament={t?.id} edition={t?.edition} slots={promotions} ends={promotionEnds} serverNow={new Date().toISOString()}/>
+ <PromotionHero winner={winner} championId={champion?.tournament_id} tournament={t?.id} edition={t?.edition} slots={promotions} ends={promotionEnds} serverNow={new Date().toISOString()} signedIn={Boolean(u)} checkoutEnabled={Boolean(t&&promotionEnds&&stripeCheckoutReady())}/>
  <section className="section arena tournament-first" id="arena">
   <div className="section-head"><div><p className="eyebrow"><span className="status-dot"/>{t?`EDITION ${String(t.edition).padStart(3,'0')} · ${t.status.toUpperCase()}`:'THE INAUGURAL EDITION'}</p><h2 className="tournament-title">{live?'The climb is on.':spotlight?`${winner?.name||'The champion'} rules the summit.`:'The next summit is yours.'}</h2></div><Link className="button" href={t&&['locked','voting','spotlight'].includes(t.status)?'#next-tournament':'/submit'}>{t&&['locked','voting','spotlight'].includes(t.status)?'Pre-enter next tournament':t?.edition===1?'Enter free — inaugural tournament':t?'Enter for $5 — one-time tournament fee':'Take your place'}<ArrowTopRightIcon/></Link></div>
   <div className="arena-top"><div><span className="tag">{t?.theme||'Tools for people who build apps'}</span><p>{live?'Choose the app you would actually use. One final choice per match.':spotlight?'Chosen by the community. 12 hours at the top.':'Eight founders. One app each. Pick an open place and submit your website.'}</p><p className="muted">{t?.fee_amount_cents===0?'The first tournament is free.':t?'$5 per entrant. Watching and voting are always free.':'First published tournament: free. Every later tournament: $5.'}</p>{t&&<p className="muted">Voting starts <LocalTime value={t.starts_at}/></p>}</div><TournamentWatch tournament={t} matches={matches} serverNow={new Date().toISOString()} spotlightEnd={spotlight?champion.spotlight_ends:undefined}/></div>
