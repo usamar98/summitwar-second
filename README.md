@@ -2,6 +2,10 @@
 
 A Next.js 16 / TypeScript / Tailwind 4 application with Supabase Auth, Postgres, Storage, and one-time Stripe Checkout payments. The repository started empty. No real records, metrics, or paid entrants are fabricated.
 
+## Completed tournament preview
+
+Open [`/demo`](https://summitwar.lol/demo) to see the finished design with eight fictional entrants, a sample champion, six filled sponsor cards, sample scores and the winner spotlight clock. Project and match links open read-only preview details. This page uses display-only fixtures, is marked noindex, and never seeds project, vote or payment records. Desktop/mobile screenshots and the targeted browser report are saved as `artifacts/final-look-*`.
+
 ## Run locally
 
 ```powershell
@@ -10,7 +14,7 @@ Copy-Item .env.example .env.local
 npm run dev
 ```
 
-Open http://localhost:3000. Without credentials the public design, rules, empty tournament, and application form render; authentication and mutations remain unavailable. `DEMO_MODE=true` only adds an explicit local preview banner and is ignored in production. Test fixtures live exclusively in the isolated test database.
+Open http://localhost:3000. Without credentials the public design, rules, empty tournament, and application form render; authentication and mutations remain unavailable. `DEMO_MODE=true` only adds an explicit local preview banner and is ignored in production. Database test fixtures are confined to the isolated test database; the separate `/demo` page uses labeled in-memory visual examples.
 
 ## Supabase setup
 

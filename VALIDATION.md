@@ -1,5 +1,11 @@
 # Completed local checks
 
+## Completed tournament visual preview
+
+- Added a separate, noindex `/demo` page using the actual winner hero, paid sponsor cards, completed bracket, tournament watch and champion participant row. All projects, sponsorships and vote counts are explicitly labeled fictional. Fixture creation is in memory; no database rows or purchases are created.
+- TypeScript and the Vercel production build passed. The targeted browser check passed against `https://summitwar.lol/demo`: six filled sponsor cards, center champion, seven completed matches, one champion row with 684 sample final votes, spotlight countdown, project/match detail dialogs, read-only sample actions, noindex metadata, and desktop/mobile layouts without overflow or page errors.
+- Desktop, mobile and hero screenshots plus the browser report are in `artifacts/final-look-*`. Sample-link clicks were verified without external navigation or vote/payment/project mutation requests.
+
 ## In-page sponsor details
 
 - Sponsor cards use transparent backgrounds, fine 1px white dashed outlines and the centered label **Sponsor by**. Each empty card opens its own details dialog without changing the page URL.

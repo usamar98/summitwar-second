@@ -18,7 +18,7 @@ try{
  check(await page.locator('.match-slot.ready').count()===7,'Completed bracket needs all seven matches');
  check(await page.locator('.participant-row').count()===1,'After the final, only the champion row should be shown');
  check(await page.locator('.participant-votes b').innerText()==='684','Champion should show the sample final votes');
- check(await page.locator('.tournament-watch').innerText().then(text=>text.includes('Winner spotlight ends in')),'Winner spotlight countdown missing');
+ check(await page.locator('.tournament-watch').innerText().then(text=>text.toLowerCase().includes('winner spotlight ends in')),'Winner spotlight countdown missing');
  const before=page.url();
  await page.locator('.promotion-occupied a').first().click();
  await page.getByRole('dialog',{name:'Kilo CRM',exact:true}).waitFor();
@@ -42,6 +42,7 @@ try{
  check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Desktop demo has horizontal overflow');
  await page.screenshot({path:'artifacts/final-look-desktop.png',fullPage:true});
  const heroBottom=await page.locator('.summit-hero').evaluate(element=>element.getBoundingClientRect().bottom+scrollY);
+ await page.setViewportSize({width:1440,height:Math.max(1100,Math.ceil(heroBottom))});
  await page.screenshot({path:'artifacts/final-look-hero.png',clip:{x:0,y:0,width:1440,height:Math.ceil(heroBottom)}});
  await page.setViewportSize({width:390,height:844});
  await page.locator('.participant-row').scrollIntoViewIfNeeded();

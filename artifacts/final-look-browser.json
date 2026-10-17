@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "site": "https://summitwar.lol/demo",
+  "scope": "Clearly labeled fictional preview; no database seeding, payments or votes submitted.",
+  "checks": [
+    "six filled sponsors",
+    "central champion",
+    "seven completed matches",
+    "one champion row",
+    "sample final score",
+    "spotlight countdown",
+    "sample project and match dialogs",
+    "no preview writes or external navigation",
+    "noindex metadata",
+    "desktop and mobile without overflow",
+    "no page errors"
+  ]
+}
