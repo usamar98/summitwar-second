@@ -1,6 +1,3 @@
-import {createHash,randomUUID} from 'node:crypto';
-import {cookies} from 'next/headers';
-import {db} from '@/lib/supabase';
+import {record} from '@/lib/analytics';
 import {uuid} from '@/lib/validation';
-export async function record(req:Request,id:string,kind:'view'|'outbound'){if(/bot|crawler|spider|preview|headless/i.test(req.headers.get('user-agent')||''))return;const jar=await cookies();let visitor=jar.get('sw_visitor')?.value;if(!visitor){visitor=randomUUID();jar.set('sw_visitor',visitor,{httpOnly:true,sameSite:'lax',secure:process.env.NODE_ENV==='production',maxAge:86400*365,path:'/'});}const {data:p}=await db().from('products').select('id').eq('id',id).eq('published',true).maybeSingle();if(!p)return;const {error}=await db().from('analytics_events').upsert({product_id:id,kind,visitor_hash:createHash('sha256').update(visitor).digest('hex'),bucket:new Date().toISOString().slice(0,10)},{onConflict:'product_id,kind,visitor_hash,bucket',ignoreDuplicates:true});if(error)throw error;}
 export async function POST(req:Request){if(req.headers.get('origin')!==new URL(req.url).origin)return new Response(null,{status:403});try{const {product}=await req.json();await record(req,uuid.parse(product),'view');return new Response(null,{status:204});}catch{return new Response(null,{status:400})}}

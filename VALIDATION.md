@@ -1,5 +1,12 @@
 # Completed local checks
 
+## Simplified sponsor cards
+
+- Empty placements show only their exact price and the centered word **Sponsor**. The whole card is a native booking link, carrying its own slot selection to the startup details form. Reserved placements retain their state label; paid startup details and disclosure remain intact.
+- Desktop/mobile browser checks passed for all six links, text centering, exact $70/$50/$30 prices on both sides, whole-card clicking, editable startup details, keyboard activation, winner placement and mobile overflow. The successful run reported no page errors. Updated screenshots and results are in `artifacts/promotions-*`; no purchase was submitted.
+- Local Webpack production compilation and TypeScript passed. Final local packaging hit a OneDrive `EBUSY` file lock; the browser checks used the running Webpack development server. A transient browser error from the first cold run did not recur in the completed check. Local Turbopack also failed to start its CSS worker, independently of the UI change.
+- The shared analytics recorder was moved from a route module to `src/lib/analytics.ts` to satisfy Next.js's route-export type check, preserving the existing recording behavior.
+
 ## Stripe checkout completion update
 
 - Full regression suite passed: **108 tests in 21 files**. New checks cover exact $5 entry checkout, free first-edition rejection of checkout, owner filtering, existing-session reuse, a safe expiry margin, raw webhook signatures, delayed success, verified intent metadata, retryable provider/database failures, private uncached status queries, review/refund/dispute states, and a new reservation after an earlier refund.

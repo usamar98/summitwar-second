@@ -1,10 +1,15 @@
 {
   "passed": true,
-  "scope": "Public unconfigured layout and disabled checkout. Database and Stripe behavior tested separately.",
+  "scope": "Public unconfigured layout and disabled checkout. Card links open the details form; no purchase was submitted. Database and Stripe behavior tested separately.",
   "checks": [
     "center winner",
     "three cards each side",
     "exact prices",
+    "price and centered Sponsor only",
+    "all six cards are booking links",
+    "whole-card click opens details form",
+    "editable startup details",
+    "keyboard card activation",
     "competition second",
     "six-card selector",
     "combined pricing",
