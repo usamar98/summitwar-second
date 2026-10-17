@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "migrations": 9,
+  "protectedTables": 33,
+  "serverCommandNames": 39,
+  "checks": [
+    "complete fresh installer applies all nine migrations atomically",
+    "repeat installation refuses safely and preserves existing tables/counter",
+    "33 tables, RLS, private permissions, 39 command names, current prices and media configuration verified",
+    "verification catches exposed votes and disabled sponsor-order RLS",
+    "admin assignment requires a real existing user and is idempotent",
+    "organizer publishes the first free edition, approves eight founders, protects entry uniqueness and starts 24-hour quarterfinals",
+    "guest voting records one final vote and consumes its single-use link without an email account",
+    "all six sponsor cards cost $300, have one owner and publish only after verified payment fulfillment",
+    "browser roles cannot read private records, run privileged commands or upload media; service role retains access",
+    "scheduler rejects missing/local settings and registers two repeat-safe jobs; stored SQL executes against simulated Cron/Vault/HTTP APIs"
+  ],
+  "scope": "Embedded PostgreSQL with simulated Supabase Auth, Storage, Vault, Cron and HTTP APIs; the platform pgcrypto extension statement is omitted in this local harness. Hosted OAuth, storage APIs, real Cron HTTP delivery, Stripe charges/refunds and independent-connection races still require configured services."
+}

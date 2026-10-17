@@ -1,5 +1,19 @@
 # Completed local checks
 
+## Supabase installation package
+
+- `scripts/package-supabase.mjs --check` confirms the delivered SQL and manifest match all nine current migrations. The combined installer contains **33 protected application tables** and **39 required server command names**. SHA-256 checksums cover the delivered setup files and individual migrations.
+- `scripts/verify-supabase-package.mjs` passed a fresh install of the actual combined SQL in isolated embedded Postgres. It verified safe refusal on repeat installation, repeat-safe media setup, supported prices/defaults, RLS/privileges, detection of exposed votes or disabled RLS, and admin assignment restricted to an existing Auth user.
+- The installed database passed organizer publication, eight-founder admission and idempotent resubmission, 24-hour quarterfinal creation, single-use guest voting, a $300 six-card sponsor booking, exclusive ownership, payment fulfillment, and browser-role denial of private data/commands/media uploads.
+- The scheduler template rejects missing secrets and local/non-HTTPS origins. Two repeat-safe jobs and their stored SQL were verified against simulated Cron/Vault/HTTP APIs. No live HTTP delivery or hosted scheduler run is claimed.
+- Supabase's platform Auth/Storage/Vault/Cron APIs are simulated in the local harness, and its pgcrypto extension statement is omitted there (UUID generation uses Postgres's built-in function). Hosted advisors, OAuth, Storage API access, independent-connection races and Stripe charge/refund settlement require the user's configured project.
+- The ZIP contains the installer, storage/admin/verification/scheduler files, nine ordered migrations, blank app environment template, checksum manifest, fresh setup guide and existing-installation guide. No production keys or real records are included.
+
+```powershell
+node scripts/package-supabase.mjs --check
+node --liftoff-only --no-wasm-tier-up --wasm-num-compilation-tasks=1 --max-old-space-size=128 scripts/verify-supabase-package.mjs
+```
+
 ## Sponsor dofollow update
 
 - All six paid promotion cards share a direct outbound link with `rel="noopener noreferrer"`. The link is followable and retains secure new-tab behavior. Cards remain visibly labelled Promoted.

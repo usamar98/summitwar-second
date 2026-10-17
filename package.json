@@ -4,6 +4,7 @@
   "description": "SummitWar: a community-voted daily indie app tournament",
   "scripts": {
     "test": "vitest run",
+    "db:package": "node scripts/package-supabase.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

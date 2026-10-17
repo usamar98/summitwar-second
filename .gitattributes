@@ -1,0 +1,3 @@
+# Keep delivered SQL bytes stable so manifest checksums also work on Windows checkouts.
+supabase/setup/** text eol=lf
+deliverables/*.zip binary
