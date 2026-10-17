@@ -1,0 +1,13 @@
+import Stripe from 'stripe';
+import {it,expect,vi,beforeEach,afterEach} from 'vitest';
+const mock=vi.hoisted(()=>({handle:vi.fn()}));
+vi.mock('../src/lib/payments',()=>({stripe:()=>new Stripe('sk_test_example'),handleStripeEvent:mock.handle}));
+import {POST} from '../src/app/api/stripe/webhook/route';
+const payload=JSON.stringify({id:'evt_signed',object:'event',type:'payment_intent.payment_failed',data:{object:{id:'pi_fixture'}}});
+const signature=()=>new Stripe('sk_test_example').webhooks.generateTestHeaderString({payload,secret:'whsec_fixture'});
+const request=(body=payload,header=signature())=>new Request('https://summitwar.example/api/stripe/webhook',{method:'POST',headers:{'stripe-signature':header},body});
+beforeEach(()=>{vi.clearAllMocks();mock.handle.mockResolvedValue(undefined);vi.stubEnv('STRIPE_SECRET_KEY','sk_test_example');vi.stubEnv('STRIPE_WEBHOOK_SECRET','whsec_fixture')});
+afterEach(()=>vi.unstubAllEnvs());
+it('fails closed when the service is not configured',async()=>{vi.stubEnv('STRIPE_WEBHOOK_SECRET','');expect((await POST(request())).status).toBe(503);expect(mock.handle).not.toHaveBeenCalled()});
+it('verifies the original raw request and rejects missing or tampered signatures',async()=>{expect((await POST(request(payload,''))).status).toBe(400);expect((await POST(request(payload+' '))).status).toBe(400);expect(mock.handle).not.toHaveBeenCalled();expect((await POST(request())).status).toBe(200);expect(mock.handle).toHaveBeenCalledWith(expect.objectContaining({id:'evt_signed'}))});
+it('returns a retryable response when fulfillment fails',async()=>{mock.handle.mockRejectedValueOnce(new Error('database unavailable'));expect((await POST(request())).status).toBe(500);expect((await POST(request())).status).toBe(200)});

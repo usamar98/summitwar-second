@@ -1,23 +1,23 @@
 import 'server-only';
 import Stripe from 'stripe';
 import {db,requireUser,rpc} from './supabase';
-import {stripe} from './stripe-client';
+import {stripe,requireStripeCheckout,checkoutOrigin} from './stripe-client';
 export {stripe} from './stripe-client';
 import {fulfillPromotionSession,promotionSignal} from './promotion-payments';
 export async function checkout(entryId:string) {
- const u=await requireUser(); const client=db();
+ const u=await requireUser(); requireStripeCheckout(); const client=db();
  const {data:e,error}=await client.from('entries').select('*,tournament:tournaments(*)').eq('id',entryId).eq('user_id',u.id).single();
  if(error||!e||e.status!=='approved')throw new Error('An approved application is required');
  const t=e.tournament; if(t.status!=='registration'||Date.now()>=Date.parse(t.registration_ends)||t.fee_amount_cents!==500||t.currency!=='usd')throw new Error('Entry is not eligible for checkout');
- const {data:r}=await client.from('reservations').select('*').eq('entry_id',e.id).eq('released',false).gt('expires_at',new Date(Date.now()+30*60000).toISOString()).maybeSingle();
+ const {data:r}=await client.from('reservations').select('*').eq('entry_id',e.id).eq('released',false).gt('expires_at',new Date(Date.now()+31*60000).toISOString()).maybeSingle();
  // Existing sessions remain reusable until their original provider expiry.
  const {data:existing}=await client.from('reservations').select('*').eq('entry_id',e.id).eq('released',false).gt('expires_at',new Date().toISOString()).maybeSingle();
  if(existing?.checkout_id){const s=await stripe().checkout.sessions.retrieve(existing.checkout_id);if(s.status==='open'&&s.url)return s.url;throw new Error('Checkout has ended. Wait for payment confirmation or request another reservation.');}
- if(!r)throw new Error('Reservation expired or has less than 30 minutes remaining. Ask the organizer for a new reservation.');
- const base=process.env.NEXT_PUBLIC_APP_URL||'http://localhost:3000';
- const session=await stripe().checkout.sessions.create({mode:'payment',allowed_payment_method_types:['card'],adaptive_pricing:{enabled:false},line_items:[{price_data:{currency:t.currency,unit_amount:t.fee_amount_cents,product_data:{name:`SummitWar edition #${t.edition} entry`}},quantity:1}],expires_at:Math.floor(Date.parse(r.expires_at)/1000),client_reference_id:e.id,metadata:{entry_id:e.id,tournament_id:t.id,reservation_id:r.id},payment_intent_data:{metadata:{entry_id:e.id,tournament_id:t.id,reservation_id:r.id}},success_url:`${base}/checkout?entry=${e.id}`,cancel_url:`${base}/dashboard`,custom_text:{submit:{message:'One-time entry fee. Participation and promotion included. No traffic or sales guarantee. Organizer cancellation or removal before participation is refundable; losing is not.'}}},{idempotencyKey:`entry-reservation-${r.id}`});
+ if(!r)throw new Error('Reservation expired or has less than 31 minutes remaining. Let it expire, then reclaim an available place from your dashboard.');
+ const base=checkoutOrigin();
+ const session=await stripe().checkout.sessions.create({mode:'payment',allowed_payment_method_types:['card'],adaptive_pricing:{enabled:false},line_items:[{price_data:{currency:t.currency,unit_amount:t.fee_amount_cents,product_data:{name:`SummitWar edition #${t.edition} entry`}},quantity:1}],expires_at:Math.floor(Date.parse(r.expires_at)/1000),client_reference_id:e.id,metadata:{entry_id:e.id,tournament_id:t.id,reservation_id:r.id},payment_intent_data:{metadata:{entry_id:e.id,tournament_id:t.id,reservation_id:r.id}},success_url:`${base}/checkout?entry=${e.id}`,cancel_url:`${base}/checkout?entry=${e.id}&cancelled=1`,custom_text:{submit:{message:'One-time entry fee. Participation and promotion included. No traffic or sales guarantee. Organizer cancellation or removal before participation is refundable; losing is not.'}}},{idempotencyKey:`entry-reservation-${r.id}`});
  const {error:updateError}=await client.from('reservations').update({checkout_id:session.id,checkout_url:session.url}).eq('id',r.id); if(updateError)throw updateError;
- return session.url!;
+ if(!session.url)throw new Error('Checkout did not return a URL');return session.url;
 }
 export async function processRefunds() {
  const {data,error}=await db().from('payments').select('*').eq('status','refund_pending').limit(50); if(error)throw error;
@@ -26,7 +26,7 @@ export async function processRefunds() {
  if(failures)throw new Error('Some refunds require another retry');
 }
 export async function handleStripeEvent(event:Stripe.Event) {
- if(event.type==='checkout.session.completed'){
+ if(event.type==='checkout.session.completed'||event.type==='checkout.session.async_payment_succeeded'){
   const s=await stripe().checkout.sessions.retrieve((event.data.object as Stripe.Checkout.Session).id);
   if(s.metadata?.kind==='promotion'){await fulfillPromotionSession(event,s);return;}
   if(s.payment_status!=='paid'||s.mode!=='payment')return;
@@ -34,7 +34,7 @@ export async function handleStripeEvent(event:Stripe.Event) {
   const {data:e}=await db().from('entries').select('tournament_id').eq('id',meta.entry_id).single();if(e?.tournament_id!==meta.tournament_id)throw new Error('Tournament mismatch');
   const intentId=typeof s.payment_intent==='string'?s.payment_intent:s.payment_intent.id;
   const pi=await stripe().paymentIntents.retrieve(intentId,{expand:['latest_charge']});
-  if(pi.status!=='succeeded'||pi.amount_received!==s.amount_total||pi.currency!==s.currency)throw new Error('Payment intent mismatch');
+  if(pi.status!=='succeeded'||pi.amount_received!==s.amount_total||pi.currency!==s.currency||pi.metadata?.entry_id!==meta.entry_id||pi.metadata?.tournament_id!==meta.tournament_id||pi.metadata?.reservation_id!==meta.reservation_id)throw new Error('Payment intent mismatch');
   const charge=typeof pi.latest_charge==='object'?pi.latest_charge:null;
   if(charge&&(charge.disputed||charge.amount_refunded===charge.amount))await rpc('record_payment_signal',{p_event:`${event.id}-signal`,p_type:event.type,p_intent:intentId,p_entry:meta.entry_id,p_status:charge.amount_refunded===charge.amount?'refunded':'disputed'});
   await rpc('fulfill_payment',{p_event:event.id,p_type:event.type,p_entry:meta.entry_id,p_checkout:s.id,p_intent:typeof s.payment_intent==='string'?s.payment_intent:s.payment_intent.id,p_amount:s.amount_total,p_currency:s.currency,p_reservation:meta.reservation_id});

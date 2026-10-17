@@ -1,5 +1,12 @@
-import {user,db} from '@/lib/supabase';
-import {redirect} from 'next/navigation';
-import Link from 'next/link';
+import {user} from '@/lib/supabase';
+import {redirect,notFound} from 'next/navigation';
+import {checkoutStatus} from '@/lib/checkout-status';
+import {PaymentConfirmation} from '@/components/payment-confirmation';
+import {uuid} from '@/lib/validation';
 export const dynamic='force-dynamic';
-export default async function CheckoutStatus({searchParams}:{searchParams:Promise<{entry?:string}>}){const u=await user();if(!u)redirect('/login');const {entry}=await searchParams;const {data:e}=await db().from('entries').select('status,review_status').eq('id',entry||'00000000-0000-0000-0000-000000000000').eq('user_id',u.id).maybeSingle();const {data:p}=e?await db().from('payments').select('status').eq('entry_id',entry).order('created_at',{ascending:false}).limit(1).maybeSingle():{data:null};return <div className="page narrow"><p className="eyebrow">ENTRY STATUS</p><h1>{e?.status==='confirmed'?(e.review_status==='approved'?'You’re in.':'Payment verified. Review pending.'):p?.status==='refund_pending'?'Refund pending.':p?.status==='refunded'?'Payment refunded.':'Payment pending.'}</h1><p className="lede">{e?.status==='confirmed'?(e.review_status==='approved'?'The server verified your payment and confirmed your place.':'Your payment is verified and your place is reserved. Organizer approval is required before your app enters voting.'):'A checkout redirect does not confirm an entry. We are waiting for a verified Stripe event, or your payment is being refunded.'}</p><Link className="button" href="/dashboard">Back to your dashboard ↗</Link></div>}
+export default async function CheckoutStatus({searchParams}:{searchParams:Promise<{entry?:string;promotion?:string;cancelled?:string}>}){
+ const owner=await user();if(!owner)redirect('/login');const params=await searchParams;
+ if(Boolean(params.entry)===Boolean(params.promotion))notFound();const kind=params.promotion?'promotion':'entry',id=uuid.safeParse(params.promotion||params.entry);if(!id.success)notFound();
+ const status=await checkoutStatus(kind,id.data,owner.id);if(!status)notFound();
+ return <div className="page narrow"><PaymentConfirmation key={`${kind}:${id.data}`} kind={kind} id={id.data} initial={status} cancelled={params.cancelled==='1'}/></div>;
+}

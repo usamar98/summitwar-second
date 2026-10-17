@@ -1,5 +1,15 @@
 # Completed local checks
 
+## Stripe checkout completion update
+
+- Full regression suite passed: **108 tests in 21 files**. New checks cover exact $5 entry checkout, free first-edition rejection of checkout, owner filtering, existing-session reuse, a safe expiry margin, raw webhook signatures, delayed success, verified intent metadata, retryable provider/database failures, private uncached status queries, review/refund/dispute states, and a new reservation after an earlier refund.
+- The final production build passed, including TypeScript and every route. A OneDrive permission issue on generated `.next` files was resolved by clearing only that verified build cache before rebuilding.
+- Ten-page desktop/mobile browser smoke checks passed. Added runtime checks confirm private payment status returns 401 with `private, no-store`, unsigned webhook requests cannot fulfill anything, checkout results redirect to sign-in, and existing promotion return URLs reach the new confirmation page. The checks handle Next.js streaming redirects as documented by the installed version. No browser page errors or mobile overflow were found.
+- Both Stripe secrets are required before new checkout is enabled. Entry and promotion returns share an owner-only confirmation screen, poll pending database status every three seconds for up to two minutes, and support resuming an unexpired reservation. Amounts and confirmation come from trusted database records; URL parameters cannot mark a booking paid.
+- No new database migration is required. The Supabase download and its checksum manifest were refreshed for the additional supported Stripe event.
+- Provider tests use the actual Stripe SDK's signature verifier and controlled API responses. Local settings remain unconfigured. The verified Production return URL is configured as `https://summitwar.lol`; the user's five Stripe/Supabase connection values and signed endpoint still require configuration. No real payment, provider refund or authenticated production purchase was performed.
+- `STRIPE_SETUP.md` contains the Vercel settings, signed webhook destination, supported events, test purchase steps and local forwarding instructions. `npm run payments:check -- --connect` checks configured services using read-only requests and prints no secret values.
+
 ## Supabase installation package
 
 - `scripts/package-supabase.mjs --check` confirms the delivered SQL and manifest match all nine current migrations. The combined installer contains **33 protected application tables** and **39 required server command names**. SHA-256 checksums cover the delivered setup files and individual migrations.

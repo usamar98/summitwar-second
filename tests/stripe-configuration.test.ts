@@ -1,0 +1,6 @@
+import {it,expect,vi,afterEach} from 'vitest';
+import {stripeCheckoutReady,checkoutOrigin} from '../src/lib/stripe-client';
+afterEach(()=>vi.unstubAllEnvs());
+it('requires both the account and webhook secrets to enable checkout',()=>{vi.stubEnv('STRIPE_SECRET_KEY','sk_test_example');vi.stubEnv('STRIPE_WEBHOOK_SECRET','');expect(stripeCheckoutReady()).toBe(false);vi.stubEnv('STRIPE_WEBHOOK_SECRET','whsec_fixture');expect(stripeCheckoutReady()).toBe(true)});
+it('accepts secure production origins and loopback local development addresses',()=>{vi.stubEnv('NEXT_PUBLIC_APP_URL','https://summitwar.example/');expect(checkoutOrigin()).toBe('https://summitwar.example');vi.stubEnv('NEXT_PUBLIC_APP_URL','http://localhost:3000');expect(checkoutOrigin()).toBe('http://localhost:3000')});
+it('rejects insecure remote returns, paths, injected credentials and missing production origin',()=>{for(const value of ['http://summitwar.example','https://user:pass@summitwar.example','https://summitwar.example/path','https://summitwar.example?next=evil']){vi.stubEnv('NEXT_PUBLIC_APP_URL',value);expect(()=>checkoutOrigin()).toThrow()}vi.stubEnv('NEXT_PUBLIC_APP_URL','');vi.stubEnv('NODE_ENV','production');expect(()=>checkoutOrigin()).toThrow('not configured')});

@@ -94,6 +94,6 @@
     "migrations/20261015102148_guest_voting.sql": "4701b5ef1692be7386fa836d8c2410239acae144e72d8d8412f22ecf7becb016",
     "migrations/20261017101030_paid_promotions.sql": "85581dac23dcf1fa979fa8a59b537dc8e466722ca443d27ebe1f3258d35225c9",
     "migrations/20261017104639_reset_promotion_prices.sql": "d30107132ea9ca20f475ae6106f9acd97ac5d21c9d17119f7f8d6d5c73c976e8",
-    "START_HERE.md": "7a70d623f5e47dd886d8575b10bf1a871c6bd63f598850479090280dce893b4e"
+    "START_HERE.md": "5ed672654059ee39d4031c959837b1b99602d5309a6f636398e9afc1fe0f3ed5"
   }
 }

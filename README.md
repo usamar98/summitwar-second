@@ -52,11 +52,14 @@ New projects automatically queue website screenshots. The existing protected `/a
 
 ## Stripe configuration
 
+For the Vercel account setup and complete checkout test steps, follow [`STRIPE_SETUP.md`](STRIPE_SETUP.md). `npm run payments:check` reports missing settings without showing values; `npm run payments:check -- --connect` additionally makes read-only Stripe/Supabase connection checks. Hosted checkout needs both `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`. `/checkout` displays private, verified entry or promotion status and polls pending results for up to two minutes; cancellation can resume the same reservation. This update uses the existing database migration package.
+
 Set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` using test credentials first. The installed SDK uses Stripe's current `allowed_payment_method_types: ['card']` filter; Adaptive Pricing is disabled to preserve the exact USD amount. Enable card payments in the Stripe dashboard.
 
 Register a **snapshot** webhook destination at `/api/stripe/webhook` for:
 
 - `checkout.session.completed`
+- `checkout.session.async_payment_succeeded`
 - `checkout.session.expired`
 - `charge.refunded`
 - `charge.dispute.created`
@@ -70,7 +73,7 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 
 Copy the listener's signing secret to your local environment. Original request bytes are signature-verified. The handler retrieves the actual Checkout Session and checks paid status, mode, internal metadata, expected amount, currency, registration status, and capacity. Redirects never confirm payment. Sessions are idempotent per reservation; duplicate delivery is recorded transactionally. Delayed and duplicate successful payments without an eligible seat enter the durable refund queue. An expired event retrieves the current session before releasing a seat, preventing stale events from undoing completion.
 
-Approval allocates a reservation lasting up to **60 minutes**, capped at registration close. At least 31 minutes of registration time must remain at approval. Start checkout while at least 30 minutes remain on the displayed reservation, as Stripe requires. A started valid session is reused through expiry. If that creation window is missed, the dashboard explains it and the organizer can reapprove after expiry; the scheduler releases abandoned seats. This deliberately does not extend reservations silently. Expired, rejected, or waitlisted applicants are not charged. Failed card attempts do not fulfill an entry; Stripe permits a retry during the same session.
+Approval allocates a reservation lasting up to **60 minutes**, capped at registration close. At least 31 minutes of registration time must remain at approval. Start a new checkout while at least 31 minutes remain on the displayed reservation, allowing a margin above Stripe’s 30-minute minimum. A started valid session is reused through expiry. If that creation window is missed, the dashboard explains it and the organizer can reapprove after expiry; the scheduler releases abandoned seats. This deliberately does not extend reservations silently. Expired, rejected, or waitlisted applicants are not charged. Failed card attempts do not fulfill an entry; Stripe permits a retry during the same session.
 
 ## Durable scheduler
 

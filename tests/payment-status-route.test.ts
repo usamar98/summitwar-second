@@ -1,0 +1,11 @@
+import {it,expect,vi,beforeEach} from 'vitest';
+const mock=vi.hoisted(()=>({user:vi.fn(),data:null as any,error:null as any,filters:[] as unknown[],tables:[] as string[]}));
+vi.mock('../src/lib/supabase',()=>({requireUser:mock.user,db:()=>({from:(table:string)=>{mock.tables.push(table);const q:any={select:()=>q,eq:(key:string,value:string)=>{mock.filters.push([key,value]);return q},maybeSingle:async()=>({data:mock.data,error:mock.error})};return q}})}));
+import {GET} from '../src/app/api/payments/status/route';
+const id='10000000-0000-4000-8000-000000000001';
+const request=(query=`kind=promotion&id=${id}`)=>new Request(`https://summitwar.example/api/payments/status?${query}`);
+beforeEach(()=>{vi.clearAllMocks();mock.filters=[];mock.tables=[];mock.error=null;mock.user.mockResolvedValue({id:'owner'});mock.data={status:'paid',amount:7000,payments:[{status:'paid'}],checkout_id:'private-checkout',user_id:'private-owner'}});
+it('requires authentication and never publicly caches payment information',async()=>{mock.user.mockRejectedValue(new Error('no user'));const response=await GET(request());expect(response.status).toBe(401);expect(response.headers.get('cache-control')).toBe('private, no-store');expect(mock.tables).toHaveLength(0)});
+it('filters bookings by their signed-in owner and returns only safe status fields',async()=>{const response=await GET(request());expect(response.status).toBe(200);expect(mock.tables).toEqual(['promotion_orders']);expect(mock.filters).toContainEqual(['id',id]);expect(mock.filters).toContainEqual(['user_id','owner']);const data=await response.json();expect(data.state).toBe('confirmed');expect(data).not.toHaveProperty('checkout_id');expect(data).not.toHaveProperty('user_id')});
+it('rejects invalid references and hides missing or other-owner orders',async()=>{expect((await GET(request('kind=wrong&id='+id))).status).toBe(400);expect((await GET(request('kind=entry&id=bad'))).status).toBe(400);mock.data=null;expect((await GET(request())).status).toBe(404)});
+it('returns a retryable status for database outages instead of inventing payment confirmation',async()=>{mock.error=new Error('database unavailable');const response=await GET(request());expect(response.status).toBe(503);expect((await response.json()).state).toBeUndefined()});

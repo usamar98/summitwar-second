@@ -5,6 +5,7 @@
   "scripts": {
     "test": "vitest run",
     "db:package": "node scripts/package-supabase.mjs",
+    "payments:check": "node scripts/check-payments.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

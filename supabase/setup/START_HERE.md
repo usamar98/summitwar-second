@@ -53,6 +53,7 @@ For guest voting, configure Cloudflare Turnstile for your website domains, then 
 For paid entries and sponsorships, set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`. Start with Stripe test keys. Configure a signed **snapshot** Stripe webhook at `https://YOUR-WEBSITE/api/stripe/webhook` for:
 
 - `checkout.session.completed`
+- `checkout.session.async_payment_succeeded`
 - `checkout.session.expired`
 - `charge.refunded`
 - `charge.dispute.created`

@@ -19,6 +19,9 @@
     "cron authorization",
     "origin validation",
     "unsigned webhook rejection",
+    "private owner-only uncached payment status",
+    "checkout authentication",
+    "legacy promotion return links",
     "mobile overflow",
     "disabled unconfigured submission",
     "no page errors"
