@@ -1,0 +1,3 @@
+export const PROMOTION_SLOTS=[{position:1,label:'Top left',price:10000},{position:2,label:'Middle left',price:70000},{position:3,label:'Bottom left',price:5000},{position:4,label:'Top right',price:10000},{position:5,label:'Middle right',price:70000},{position:6,label:'Bottom right',price:5000}] as const;
+export type PromotionSlot={position:number;price:number;state:'available'|'reserved'|'paid'|'closed';name?:string|null;url?:string|null;tagline?:string|null;logo_url?:string|null};
+export function promotionTotal(slots:number[]){if(!slots.length||new Set(slots).size!==slots.length||slots.some(p=>!PROMOTION_SLOTS.some(s=>s.position===p)))throw new Error('Choose distinct promotion cards');return slots.reduce((sum,p)=>sum+PROMOTION_SLOTS.find(s=>s.position===p)!.price,0)}

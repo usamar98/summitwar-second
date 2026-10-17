@@ -1,7 +1,9 @@
 import 'server-only';
 import Stripe from 'stripe';
 import {db,requireUser,rpc} from './supabase';
-export function stripe() { if(!process.env.STRIPE_SECRET_KEY) throw new Error('Stripe is not configured'); return new Stripe(process.env.STRIPE_SECRET_KEY); }
+import {stripe} from './stripe-client';
+export {stripe} from './stripe-client';
+import {fulfillPromotionSession,promotionSignal} from './promotion-payments';
 export async function checkout(entryId:string) {
  const u=await requireUser(); const client=db();
  const {data:e,error}=await client.from('entries').select('*,tournament:tournaments(*)').eq('id',entryId).eq('user_id',u.id).single();
@@ -26,6 +28,7 @@ export async function processRefunds() {
 export async function handleStripeEvent(event:Stripe.Event) {
  if(event.type==='checkout.session.completed'){
   const s=await stripe().checkout.sessions.retrieve((event.data.object as Stripe.Checkout.Session).id);
+  if(s.metadata?.kind==='promotion'){await fulfillPromotionSession(event,s);return;}
   if(s.payment_status!=='paid'||s.mode!=='payment')return;
   const meta=s.metadata; if(!meta?.entry_id||!meta.reservation_id||!meta.tournament_id||!s.payment_intent)throw new Error('Missing checkout metadata');
   const {data:e}=await db().from('entries').select('tournament_id').eq('id',meta.entry_id).single();if(e?.tournament_id!==meta.tournament_id)throw new Error('Tournament mismatch');
@@ -36,11 +39,11 @@ export async function handleStripeEvent(event:Stripe.Event) {
   if(charge&&(charge.disputed||charge.amount_refunded===charge.amount))await rpc('record_payment_signal',{p_event:`${event.id}-signal`,p_type:event.type,p_intent:intentId,p_entry:meta.entry_id,p_status:charge.amount_refunded===charge.amount?'refunded':'disputed'});
   await rpc('fulfill_payment',{p_event:event.id,p_type:event.type,p_entry:meta.entry_id,p_checkout:s.id,p_intent:typeof s.payment_intent==='string'?s.payment_intent:s.payment_intent.id,p_amount:s.amount_total,p_currency:s.currency,p_reservation:meta.reservation_id});
  }else if(event.type==='checkout.session.expired'){
-  const s=event.data.object as Stripe.Checkout.Session; const live=await stripe().checkout.sessions.retrieve(s.id);if(live.status!=='expired')return;
+  const s=event.data.object as Stripe.Checkout.Session; const live=await stripe().checkout.sessions.retrieve(s.id);if(live.metadata?.kind==='promotion'){if(live.status==='expired'){const {error}=await db().from('promotion_orders').update({status:'expired'}).eq('checkout_id',live.id).eq('status','pending');if(error)throw error;}return;}if(live.status!=='expired')return;
   const {error}=await db().from('reservations').update({released:true}).eq('checkout_id',s.id);if(error)throw error;
  }else if(event.type==='charge.dispute.created'||event.type==='charge.refunded'){
   const obj=event.data.object as Stripe.Dispute|Stripe.Charge; const chargeId=event.type==='charge.dispute.created'?(typeof (obj as Stripe.Dispute).charge==='string'?(obj as Stripe.Dispute).charge as string:((obj as Stripe.Dispute).charge as Stripe.Charge).id):(obj as Stripe.Charge).id;const charge=await stripe().charges.retrieve(chargeId);
-  if(charge.payment_intent){const intentId=typeof charge.payment_intent==='string'?charge.payment_intent:charge.payment_intent.id;const pi=await stripe().paymentIntents.retrieve(intentId);if(pi.metadata.entry_id&&(charge.disputed||charge.amount_refunded===charge.amount))await rpc('record_payment_signal',{p_event:event.id,p_type:event.type,p_intent:intentId,p_entry:pi.metadata.entry_id,p_status:charge.amount_refunded===charge.amount?'refunded':'disputed'});}
+  if(charge.payment_intent){const intentId=typeof charge.payment_intent==='string'?charge.payment_intent:charge.payment_intent.id;const pi=await stripe().paymentIntents.retrieve(intentId);if(await promotionSignal(event,pi,charge))return;if(pi.metadata.entry_id&&(charge.disputed||charge.amount_refunded===charge.amount))await rpc('record_payment_signal',{p_event:event.id,p_type:event.type,p_intent:intentId,p_entry:pi.metadata.entry_id,p_status:charge.amount_refunded===charge.amount?'refunded':'disputed'});}
  }
 }
 

@@ -1,0 +1,9 @@
+import {randomUUID} from 'node:crypto';
+import {z} from 'zod';
+import {requireUser,requireAdmin,rpc} from '@/lib/supabase';
+import {uuid} from '@/lib/validation';
+import {publicUrl,siteMetadata} from '@/lib/site-metadata';
+import {promotionCheckout} from '@/lib/promotion-payments';
+import {stripe} from '@/lib/stripe-client';
+const booking=z.object({tournament:uuid,request:uuid,slots:z.array(z.number().int().min(1).max(6)).min(1).max(6),name:z.string().trim().min(2).max(80),url:z.string().max(2000)});
+export async function POST(req:Request){if(req.headers.get('origin')!==new URL(req.url).origin)return Response.json({error:'Invalid origin'},{status:403});try{const body=await req.json(),actor=await requireUser();if(body.action==='remove'){await requireAdmin();await rpc('remove_promotion',{p_actor:actor.id,p_order:uuid.parse(body.order),p_reason:z.string().trim().min(3).max(500).parse(body.reason)});return Response.json({ok:true})}if(body.action==='checkout')return Response.json({url:await promotionCheckout(uuid.parse(body.order))});stripe();const p=booking.parse(body);publicUrl(p.url);await rpc('limit_site_lookup',{p_actor:actor.id});const metadata=await siteMetadata(p.url);const id=await rpc('reserve_promotion',{p_actor:actor.id,p_tournament:p.tournament,p_slots:p.slots,p_request:p.request||randomUUID(),p_product:{name:p.name,url:new URL(p.url).href,tagline:metadata.tagline,logo_url:`${new URL(req.url).origin}/api/site-icon?url=${encodeURIComponent(metadata.favicon)}`}});try{return Response.json({order:id,url:await promotionCheckout(id)})}catch(e){return Response.json({order:id,error:e instanceof Error?e.message:'Checkout could not start. Resume this booking from your promotions page.'},{status:400})}}catch(e){return Response.json({error:e instanceof Error?e.message:'Promotion booking failed'},{status:400})}}

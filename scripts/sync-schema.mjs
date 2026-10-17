@@ -13,3 +13,5 @@ fs.writeFileSync('package-lock.json',JSON.stringify(lock,null,2)+'\n');
 fs.copyFileSync('supabase/extended-tournaments.sql','supabase/migrations/20261012191709_extended_tournament_schedule.sql');
 
 fs.copyFileSync('supabase/guest-voting.sql','supabase/migrations/20261015102148_guest_voting.sql');
+
+fs.copyFileSync('supabase/paid-promotions.sql','supabase/migrations/20261017101030_paid_promotions.sql');

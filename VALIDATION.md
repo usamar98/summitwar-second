@@ -1,5 +1,19 @@
 # Completed local checks
 
+## Winner hero and paid promotion update
+
+- Full regression suite passed: **83 tests in 16 files**. Added checks cover exact placement prices, multi-card totals, Stripe checkout ownership/idempotency, verified payment amounts/metadata, refund retries, and preserving the current spotlight when the next bracket locks.
+- Standalone TypeScript and the production build passed.
+- `scripts/verify-promotions.mjs` applied all eight SQL sources in embedded Postgres and passed checks for all six cards owned by one buyer, atomic slot claims, canonical prices, hidden unpaid placements, duplicate payment events, extra captures, late-payment conflicts/refunds, refund-before-completion signals, expiry without a visitor/cron dependency, moderation/cancellation refunds, revision changes, and private-table/RPC access.
+- Desktop/mobile promotion layout checks verify the center winner, three cards on each side, $100/$700/$50 pricing per side, competition as the second section, six-card purchase selection, $1,700 combined price, mobile order/overflow and no page errors. Current screenshots and results are in `artifacts/promotions-*`.
+- Public checks use honest empty/unconfigured states. No fabricated real winner, advertiser, charge or payment confirmation was introduced. Hosted independent-connection races, Stripe test/live charges and refund settlement still require deployment credentials.
+- Apply `20261017101030_paid_promotions.sql` after the earlier migrations. Existing Stripe webhook credentials and scheduler are reused. Promotion expiry includes the winner spotlight. The server filters expired ads immediately; browser expiry also removes them, and the scheduler releases reservations and queues cancellation refunds.
+
+```powershell
+node --liftoff-only --no-wasm-tier-up --wasm-num-compilation-tasks=1 --max-old-space-size=128 scripts/verify-promotions.mjs
+node scripts/promotions-browser.mjs
+```
+
 ## Email-free guest voting update
 
 - Full Vitest regression suite passed: **74 tests in 13 files**. This includes signed browser identity, token/handle validation, guest API checks, bot verification, and existing payment/database/community behavior.

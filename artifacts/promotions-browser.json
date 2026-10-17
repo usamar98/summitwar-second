@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "scope": "Public unconfigured layout and disabled checkout. Database and Stripe behavior tested separately.",
+  "checks": [
+    "center winner",
+    "three cards each side",
+    "exact prices",
+    "competition second",
+    "six-card selector",
+    "combined pricing",
+    "mobile order and overflow",
+    "no page errors"
+  ]
+}
