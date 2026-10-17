@@ -15,3 +15,4 @@ fs.copyFileSync('supabase/extended-tournaments.sql','supabase/migrations/2026101
 fs.copyFileSync('supabase/guest-voting.sql','supabase/migrations/20261015102148_guest_voting.sql');
 
 fs.copyFileSync('supabase/paid-promotions.sql','supabase/migrations/20261017101030_paid_promotions.sql');
+fs.copyFileSync('supabase/promotion-pricing.sql','supabase/migrations/20261017104639_reset_promotion_prices.sql');
