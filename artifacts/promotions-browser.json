@@ -1,19 +1,20 @@
 {
   "passed": true,
-  "scope": "Public unconfigured layout and disabled checkout. Card links open the details form; no purchase was submitted. Database and Stripe behavior tested separately.",
+  "scope": "Public unconfigured UI. All six dialogs, single-card prices and editable fields verified; no purchase submitted. Database and payment checks are separate.",
   "checks": [
-    "center winner",
+    "Sponsor by label",
+    "transparent cards with thin dashed borders",
     "three cards each side",
-    "exact prices",
-    "price and centered Sponsor only",
-    "all six cards are booking links",
-    "whole-card click opens details form",
-    "editable startup details",
-    "keyboard card activation",
-    "competition second",
-    "six-card selector",
-    "combined pricing",
-    "mobile order and overflow",
+    "all six placement dialogs",
+    "exact single-card prices",
+    "no card navigation",
+    "whole-card and keyboard activation",
+    "editable startup fields",
+    "initial focus and focus trap",
+    "Escape, close button and backdrop dismissal",
+    "focus and scroll restoration",
+    "mobile dialog without overflow",
+    "multi-card page preserved",
     "no page errors"
   ]
 }
