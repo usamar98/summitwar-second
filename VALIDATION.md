@@ -1,12 +1,16 @@
 # Completed local checks
 
+## Sponsor dofollow update
+
+- All six paid promotion cards share a direct outbound link with `rel="noopener noreferrer"`. The link is followable and retains secure new-tab behavior. Cards remain visibly labelled Promoted.
+- Production build, including TypeScript and all route generation, passed. This change requires no additional database migration.
+
 ## Promotion pricing reset
 
 - Full regression suite passed: **86 tests in 16 files**, including the new $70/$50/$30 prices, $300 combined total, historical checkout pricing and rejection of missing/unsupported price versions.
 - Production build (including TypeScript) and desktop/mobile browser checks passed. Both hero columns show the updated prices, purchase terms show $300 for all six, and mobile layouts have no horizontal overflow or page errors. Updated screenshots are in `artifacts/promotions-*`.
 - `scripts/verify-promotions.mjs` applied the pricing migration over an existing pending booking in embedded Postgres. Its original amount/version and payment contract were preserved; new reservations use version 2 and the updated amounts. Exclusivity, payment replay/refunds, expiry and private access checks also passed.
 - Apply `20261017104639_reset_promotion_prices.sql` after the paid-promotions migration and before deploying this update. Hosted database changes and live payment settlement require deployment credentials.
-- Paid sponsor links retain `rel="sponsored noopener noreferrer"`, following [Google's paid-link guidance](https://developers.google.com/search/docs/crawling-indexing/qualify-outbound-links).
 
 ## Winner hero and paid promotion update
 
