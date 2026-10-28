@@ -3,6 +3,7 @@ import {useEffect,useRef,useState,type MouseEvent,type ReactNode} from 'react';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import type {Entry,Match,Product} from '@/lib/types';
 import {SiteLogo} from './site-logo';
+import {keepDialogFocus} from './promotion-booking-dialog';
 
 type Detail={key:string;title:string;body:string;project?:Product};
 function DemoDetail({detail,onClose}:{detail:Detail;onClose:()=>void}){
@@ -13,20 +14,19 @@ function DemoDetail({detail,onClose}:{detail:Detail;onClose:()=>void}){
   modal.showModal();document.body.style.overflow='hidden';
   return()=>{modal.close();document.body.style.overflow=overflow;if(trigger?.isConnected)trigger.focus()};
  },[]);
- return <dialog ref={dialog} className="promotion-dialog demo-detail" aria-labelledby="demo-detail-title" onCancel={event=>{event.preventDefault();onClose()}} onClick={event=>{if(event.target===event.currentTarget)onClose()}} onKeyDown={event=>{if(event.key==='Tab')event.preventDefault()}}><div className="promotion-dialog-content"><div className="promotion-dialog-heading"><div><p className="eyebrow">FICTIONAL DEMO</p><h2 id="demo-detail-title">{detail.title}</h2></div><button type="button" className="drawer-close" onClick={onClose} aria-label="Close demo details"><Cross2Icon width={22} height={22}/></button></div>{detail.project&&<div className="demo-project-heading"><SiteLogo src={detail.project.logo_url} name={detail.project.name} size={64}/><div><p>{detail.project.category}</p><p>by {detail.project.founder}</p></div></div>}<p className="demo-detail-body">{detail.body}</p>{detail.project&&<p className="demo-example-url">{detail.project.url}</p>}<p className="demo-detail-note">This is sample content for the visual preview. No real project, vote, sponsorship or purchase is created.</p></div></dialog>;
+ return <dialog ref={dialog} className="promotion-dialog demo-detail" aria-labelledby="demo-detail-title" onCancel={event=>{event.preventDefault();onClose()}} onClick={event=>{if(event.target===event.currentTarget)onClose()}} onKeyDown={keepDialogFocus}><div className="promotion-dialog-content"><div className="promotion-dialog-heading"><div><p className="eyebrow">FICTIONAL DEMO</p><h2 id="demo-detail-title">{detail.title}</h2></div><button type="button" className="drawer-close" onClick={onClose} aria-label="Close demo details"><Cross2Icon width={22} height={22}/></button></div>{detail.project&&<div className="demo-project-heading"><SiteLogo src={detail.project.logo_url} name={detail.project.name} size={64}/><div><p>{detail.project.category}</p><p>by {detail.project.founder}</p></div></div>}<p className="demo-detail-body">{detail.body}</p>{detail.project&&<p className="demo-example-url">{detail.project.url}</p>}<p className="demo-detail-note">This is sample content for the visual preview. No real project, vote, sponsorship or purchase is created.</p></div></dialog>;
 }
 
 export function DemoPreview({projects,entries,matches,children}:{projects:Product[];entries:Entry[];matches:Match[];children:ReactNode}){
  const [detail,setDetail]=useState<Detail|null>(null);
  function inspect(event:MouseEvent<HTMLDivElement>){
   if(!(event.target instanceof Element))return;
-  if(event.target.closest('.promotion-book')){event.preventDefault();event.stopPropagation();setDetail({key:'sample-takeover',title:'Overtake a sponsor card',body:'Empty cards start at $100. Takeovers require at least $1 more than the current sponsor paid per card, or a higher amount you choose. All sponsors expire before the next tournament. On the live tournament, verified payment replaces the sponsor on the cards you choose. The existing ad stays visible during checkout. These sample cards do not accept payments.'});return}
   const anchor=event.target.closest('a');
   if(anchor){
    const url=new URL(anchor.href,location.href);
    if(url.pathname==='/promote'){event.preventDefault();event.stopPropagation();setDetail({key:'sample-sponsors',title:'Six sample sponsor places',body:'Empty cards start at $100. Takeovers start at $1 more than the current per-card bid, with higher bids allowed. All sponsor cards reset before the next tournament. This preview shows all six filled. Visit the live tournament to book a real placement.'});return}
    let product=projects.find(project=>url.pathname===`/products/${project.slug}`||url.pathname===`/api/outbound/${project.id}`||url.href===project.url||url.href===`${project.url}/`);
-   if(url.pathname==='/champions/demo-edition-001')product=projects[0];
+   if(url.pathname==='/champions/demo-edition-001'||url.pathname===`/products/${projects[0].slug}`){event.preventDefault();event.stopPropagation();document.getElementById('demo-winner-benefits')?.scrollIntoView({block:'start'});return}
    const match=matches.find(match=>url.pathname===`/matches/${match.id}`);
    if(product){event.preventDefault();event.stopPropagation();setDetail({key:product.id,title:product.name,body:product.tagline,project:product});return}
    if(match){

@@ -14,5 +14,8 @@ Tournament entry and pre-entry are permanently free. All six sponsor placements 
 ## Accessibility
 Keep keyboard access, visible focus, native controls, readable contrast, honest empty states, responsive layouts and reduced-motion support already present in the project.
 
+## Interactive demo
+The `/demo` route uses clearly labelled fictional startups and sample votes. Visitors can preview higher sponsor bids, replace a card in browser memory, and clear all cards for the next tournament. Never send demo bids to the payment API or store demo projects in Supabase. Winner pages, badges, reports and social posts shown here are visual examples; no social post is sent.
+
 ## Tournament rewards
 Show the rewards comparison directly below the tournament and before the participant list. Every participant receives tournament exposure, community tools, battle cards and a private performance report. Only startups with an actual recorded championship receive a permanent standalone startup page with a do-follow website link. Explicitly name that link in winner rewards. Participant links lead to battles or tournament results. Social posts, pinning and interviews require organizer action.

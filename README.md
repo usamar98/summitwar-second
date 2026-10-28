@@ -4,7 +4,7 @@ A Next.js 16 / TypeScript / Tailwind 4 application with Supabase Auth, Postgres,
 
 ## Completed tournament preview
 
-Open [`/demo`](https://summitwar.lol/demo) to see the finished design with eight fictional entrants, a sample champion, six filled sponsor cards, sample scores and the winner spotlight clock. Project and match links open read-only preview details. This page uses display-only fixtures, is marked noindex, and never seeds project, vote or payment records. Desktop/mobile screenshots and the targeted browser report are saved as `artifacts/final-look-*`.
+Open [`/demo`](https://summitwar.lol/demo) for eight fictional entrants, a sample champion and six sponsor cards priced at $100, $175, $250.50, $450, $125 and $310. Click Overtake to choose a higher bid and replace one card in browser memory; Preview next tournament clears the cards and resets opening bids to $100. Reset demo restores the original sponsors. Below the bracket and rewards comparison, visual examples show the winner’s permanent page, do-follow website link, badge, private report and sample social post, plus sponsor placement and link benefits. This page is marked noindex. It creates no database records, checkout sessions, payments or social posts.
 
 ## Run locally
 

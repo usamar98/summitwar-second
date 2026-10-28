@@ -5,7 +5,7 @@ import {PROMOTION_SLOTS,canBookPromotion,minimumPromotionBid,promotionDollars,ty
 import {PromotionForm} from './promotion-form';
 import {LocalTime} from './widgets';
 
-function keepDialogFocus(event:KeyboardEvent<HTMLDialogElement>){
+export function keepDialogFocus(event:KeyboardEvent<HTMLDialogElement>){
  if(event.key!=='Tab')return;
  const controls=Array.from(event.currentTarget.querySelectorAll<HTMLElement>('a[href],button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex]:not([tabindex="-1"])')).filter(element=>element.tabIndex>=0&&element.getClientRects().length>0);
  const first=controls[0],last=controls.at(-1);
