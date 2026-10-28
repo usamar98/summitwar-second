@@ -1,5 +1,13 @@
 # Completed local checks
 
+## Rewards section and winner startup pages, 28 October 2026
+
+- Added the participant/winner rewards comparison immediately after the tournament and before participant rows on the homepage and fictional demo. Shared benefits, winner-only benefits and organizer-provided social promotion are identified explicitly. The entry call to action opens the existing submission sidebar.
+- Permanent standalone startup pages and product share images now require a recorded champion relationship. Organizer approval and product ownership alone cannot grant a page. Non-winner startup metadata is marked noindex; denied pages return the Next.js not-found boundary. Participant, bracket, archive, saved-app, dashboard and report links lead to battles/results unless a startup has won.
+- Kept tournament feedback, saves/follows and private reports. Match pages record deduplicated project views so participants can still measure attention without a standalone startup page.
+- All **120 tests across 23 files** passed, including nine new winner-access checks and malformed share-image ID rejection. TypeScript and the optimized production build passed. A read-only request verified the product-to-entry-to-champion relationship against the hosted Supabase API; no migration or production fixture records were needed.
+- Browser checks of the production build confirmed section order, all seven benefit rows, the winner-only startup-page row, the organizer-action label, desktop appearance, the mobile layout without horizontal overflow, and opening the submission sidebar. Evidence is in `artifacts/tournament-rewards-browser.json` and the desktop/mobile screenshots.
+
 ## Free entry and $100 sponsor takeovers, 28 October 2026
 
 - Every tournament and pre-entry is free. A database trigger normalizes organizer publication, scheduler-created editions and server inserts to zero entry fees. Legacy entry checkout is disabled; a late legacy charge queues a refund without releasing the free application.

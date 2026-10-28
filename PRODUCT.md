@@ -13,3 +13,6 @@ Tournament entry and pre-entry are permanently free. All six sponsor placements 
 
 ## Accessibility
 Keep keyboard access, visible focus, native controls, readable contrast, honest empty states, responsive layouts and reduced-motion support already present in the project.
+
+## Tournament rewards
+Show the rewards comparison directly below the tournament and before the participant list. Every participant receives tournament exposure, community tools, battle cards and a private performance report. Only startups with an actual recorded championship receive a permanent standalone startup page with a website link. Participant links lead to battles or tournament results. Social posts, pinning and interviews require organizer action.

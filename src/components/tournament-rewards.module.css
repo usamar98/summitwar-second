@@ -1,0 +1,22 @@
+.rewards{border-top:1px solid var(--line)}
+.heading{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;margin-bottom:30px}
+.heading h2{margin-top:12px;font-size:32px}
+.heading>p{max-width:38ch;font-size:13px;line-height:1.8}
+.tableWrap{width:100%;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.table{display:table;width:100%;table-layout:fixed;border-collapse:collapse;font-size:12px}
+.table th,.table td{padding:19px 22px;text-align:left;vertical-align:middle;border-bottom:1px solid var(--line)}
+.table tr>:first-child{width:54%}
+.table tr>:last-child{background:oklch(23% .025 139)}
+.table thead th{font-size:11px;font-weight:500;color:var(--muted)}
+.table thead th:last-child{color:var(--accent)}
+.table tbody th{font-weight:400}
+.table tbody th strong{display:block;color:var(--text);font-size:14px;font-weight:500;line-height:1.4}
+.table tbody th>span{display:block;color:var(--muted);font-size:11px;line-height:1.6;margin-top:5px;max-width:62ch}
+.table tbody tr:last-child>*{border-bottom:0}
+.winnerLabel,.included{display:inline-flex;align-items:center;gap:8px}
+.winnerLabel svg,.included svg{flex-shrink:0;width:16px;height:16px;color:var(--accent)}
+.exclusive{color:var(--muted);font-size:11px}
+.footer{display:flex;justify-content:space-between;align-items:center;gap:32px;margin-top:22px}
+.footer p{max-width:75ch;font-size:11px;line-height:1.8}
+.footer a{flex-shrink:0}
+@media(max-width:650px){.heading{display:block;margin-bottom:24px}.heading h2{font-size:28px}.heading>p{margin-top:16px}.table th,.table td{padding:14px 10px}.table tr>:first-child{width:48%}.table thead th{font-size:10px}.table tbody th strong{font-size:12px}.table tbody th>span{font-size:10px}.table td{font-size:10px}.winnerLabel,.included{gap:5px}.winnerLabel svg,.included svg{width:13px;height:13px}.included{align-items:flex-start}.exclusive{font-size:10px}.footer{align-items:flex-start;flex-direction:column;gap:18px}}

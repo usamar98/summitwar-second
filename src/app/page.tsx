@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import {TournamentRewards} from '@/components/tournament-rewards';
 import {PromotionHero} from '@/components/promotion-hero';
 import {promotionInventory,promotionEnd} from '@/lib/promotions';
 import {stripeCheckoutReady} from '@/lib/stripe-client';
@@ -28,9 +29,10 @@ export default async function Home(){
   <Bracket roundHours={t?.extended_cycle===false?(t.daily_cycle===false?[24,16,8]:[4,4,4]):[24,24,12]} matches={matches} entries={entries} tournamentId={t?.id} bookedSlots={seats?.booked_slots||[]} scores={scores}/>
   <div className="arena-bottom"><span><TriangleUpIcon/>{seats?`${seats.confirmed}/8 confirmed · ${seats.reserved} reserved · ${seats.available} available`:'Applications open when the organizer publishes the first tournament.'}</span><span>24h quarterfinals / 24h semifinals / 12h final · 12h winner spotlight</span></div>
  </section>
+ <TournamentRewards/>
  <ParticipantList entries={entries} matches={matches} scores={scores} userId={u?.id} votedMatches={votes} tournamentStatus={t?.status} followedProducts={follows.data?.map(f=>f.product_id)||[]} savedProducts={saved.data?.map(s=>s.product_id)||[]}/>
  <NextEdition currentId={t?.id}/>
- <section className="section how"><div><p className="eyebrow">A SIMPLE PATH TO THE TOP</p><h2>Built it?<br/>Battle it.</h2><p className="muted">Submit your website. Let the community discover it.</p><Link className="text-link" href="/rules">Read the rules <ArrowTopRightIcon/></Link></div><div className="steps">{[['01','Take an open place','Add your website link. Its favicon and tagline are fetched automatically.'],['02','Let the community decide','Eight apps face off in a 60-hour bracket. Every round starts fresh.'],['03','Take the summit','The champion gets 12 hours in the spotlight. Every entrant stays discoverable.']].map(([n,title,body])=><div className="step" key={n}><span>{n}</span><div><h3>{title}</h3><p>{body}</p></div></div>)}</div></section>
- <section className="entry-strip"><div><p className="eyebrow">YOUR NEXT LAUNCH DESERVES AN AUDIENCE</p><h2>Meet you at the summit.</h2><p><CheckIcon/> Permanent product page <CheckIcon/> Community feedback <CheckIcon/> Battle card</p></div><Link className="button" href="/submit">Take your place <ArrowTopRightIcon/></Link></section>
+ <section className="section how"><div><p className="eyebrow">A SIMPLE PATH TO THE TOP</p><h2>Built it?<br/>Battle it.</h2><p className="muted">Submit your website. Let the community discover it.</p><Link className="text-link" href="/rules">Read the rules <ArrowTopRightIcon/></Link></div><div className="steps">{[['01','Take an open place','Add your website link. Its favicon and tagline are fetched automatically.'],['02','Let the community decide','Eight apps face off in a 60-hour bracket. Every round starts fresh.'],['03','Take the summit','The champion gets a permanent startup page and 12 hours in the spotlight.']].map(([n,title,body])=><div className="step" key={n}><span>{n}</span><div><h3>{title}</h3><p>{body}</p></div></div>)}</div></section>
+ <section className="entry-strip"><div><p className="eyebrow">YOUR NEXT LAUNCH DESERVES AN AUDIENCE</p><h2>Meet you at the summit.</h2><p><CheckIcon/> Free tournament entry <CheckIcon/> Community feedback <CheckIcon/> Battle card</p></div><Link className="button" href="/submit">Take your place <ArrowTopRightIcon/></Link></section>
  </>;
 }

@@ -8,3 +8,6 @@ A centered community winner is the primary hero focal point. Three clearly label
 
 ## Components and behavior
 Use the existing button, field, panel and link vocabulary. Empty sponsor cards use transparent surfaces, fine dashed white outlines and the centered label Sponsor by. Clicking a card opens a centered details dialog for that placement without navigating; the dedicated promotion page still supports multiple-card purchases. On small screens show the winner first, then labelled promotion placements, then the competition. Use restrained full borders rather than decorative side stripes. Keep native focus and reduced-motion behavior.
+
+## Tournament rewards
+Show the rewards comparison directly below the tournament and before the participant list. Every participant receives tournament exposure, community tools, battle cards and a private performance report. Only startups with an actual recorded championship receive a permanent standalone startup page with a website link. Participant links lead to battles or tournament results. Social posts, pinning and interviews require organizer action.

@@ -1,8 +1,10 @@
 import {ImageResponse} from 'next/og';
 import {db,configured} from '@/lib/supabase';
 import {safeCardLogo} from '@/lib/media';
+import {winnerProduct} from '@/lib/winner-products';
+import {uuid} from '@/lib/validation';
 export async function GET(req:Request,{params}:{params:Promise<{kind:string;id:string}>}){if(!configured())return new Response('Not found',{status:404});const {kind,id}=await params;let title='',subtitle='',logo:string|null=null;
-if(kind==='product'){const {data:p}=await db().from('products').select('name,tagline,logo_url').eq('id',id).eq('published',true).maybeSingle();if(!p)return new Response('Not found',{status:404});title=p.name;subtitle=p.tagline;logo=safeCardLogo(p.logo_url);}
+if(kind==='product'){if(!uuid.safeParse(id).success)return new Response('Not found',{status:404});const p=await winnerProduct('id',id);if(!p)return new Response('Not found',{status:404});title=p.name;subtitle=p.tagline;logo=safeCardLogo(p.logo_url);}
 else if(kind==='tournament'){const {data:t}=await db().from('tournaments').select('theme,edition').eq('id',id).not('edition','is',null).maybeSingle();if(!t)return new Response('Not found',{status:404});title=`Edition #${t.edition}`;subtitle=t.theme;}
 else if(kind==='champion'){const {data:c}=await db().from('champions').select('entry:entries(snapshot)').eq('tournament_id',id).maybeSingle();if(!c)return new Response('Not found',{status:404});const p=(c.entry as unknown as {snapshot:{name:string;logo_url:string}}).snapshot;title=p.name;subtitle='SummitWar champion · The community’s choice';logo=safeCardLogo(p.logo_url);}
 else return new Response('Not found',{status:404});

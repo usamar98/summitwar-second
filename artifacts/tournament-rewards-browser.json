@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "scope": "Local production build, no entries, votes or purchases submitted.",
+  "rewardsImmediatelyAfterTournament": true,
+  "desktopInspected": true,
+  "mobile": {
+    "pageWidth": 375,
+    "rows": [
+      [
+        "Tournament exposure & community feedback\nCompete, collect votes, and let visitors follow or save your app.",
+        "Included",
+        "Included"
+      ],
+      [
+        "Battle cards & shareable match links\nBring your community to the battle with a card built for sharing.",
+        "Included",
+        "Included"
+      ],
+      [
+        "Private performance report\nSee your valid votes, recorded project views, website clicks and feedback.",
+        "Included",
+        "Included"
+      ],
+      [
+        "Permanent startup page with a website link\nAn earned home for your startup on SummitWar.",
+        "Winner only",
+        "Included"
+      ],
+      [
+        "12-hour homepage winner spotlight\nTake the center card above the tournament.",
+        "Winner only",
+        "Included"
+      ],
+      [
+        "Champion badge & Hall of Fame\nKeep your result and put the winner badge on your own website.",
+        "Winner only",
+        "Included"
+      ],
+      [
+        "X promotion & founder interview\nA winner announcement, pinned post and short interview.",
+        "Winner only",
+        "Organizer provided"
+      ]
+    ],
+    "tableWidth": 325.6000061035156,
+    "viewport": 390
+  }
+}
