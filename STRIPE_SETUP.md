@@ -1,6 +1,6 @@
 # Connect your Stripe account to SummitWar
 
-SummitWar uses Stripe-hosted card checkout only for optional sponsor cards: $100 each, or $600 for all six. Tournament entry is permanently free in every edition. Prices come from the database/server, and only verified payments can confirm bookings. No Stripe Product or Price IDs need to be created manually.
+SummitWar uses Stripe-hosted card checkout only for optional sponsor cards: opening bids of $100 each, or $600 for six empty cards. Replacing a sponsor requires at least $1 more per card than that sponsor paid; buyers can choose higher bids. Each checkout uses immutable recorded per-card amounts. All sponsors expire before the next tournament starts, and new cards open at $100. Tournament entry is permanently free in every edition. Prices come from the database/server, and only verified payments can confirm bookings. No Stripe Product or Price IDs need to be created manually.
 
 ## Production settings in Vercel
 
@@ -41,8 +41,8 @@ Copy that destination's signing secret into Vercel's `STRIPE_WEBHOOK_SECRET`, sa
 Use Stripe test keys, with a signed-in founder account and a published tournament. Check the following flows:
 
 1. Every edition confirms entry after organizer approval without Stripe checkout. Old entry checkout links must also refuse payment.
-2. Sponsor selection opens checkout at $100 per selected card, or $600 for all six.
-3. Book an occupied sponsor card. The old ad must stay visible until the replacement payment succeeds. Only selected cards change; another overlapping checkout must wait. A fully overtaken booking shows as overtaken, without an automatic refund.
+2. Sponsor selection opens checkout at the chosen per-card bids, with empty cards starting at $100. The total must equal the recorded bid sum.
+3. Book an occupied sponsor card: same-price bids and bids less than $1 above its current amount must be rejected. An exact $1 increment or higher custom bid is accepted. The old ad must stay visible until the replacement payment succeeds. Only selected cards change; another overlapping checkout must wait. A fully overtaken booking shows as overtaken, without an automatic refund.
 4. In test checkout, use `4242 4242 4242 4242`, a future expiry and any three-digit CVC. Use Stripe's documented test cards only while in test mode.
 5. The return page shows pending, verified, review, refund or expired status from your own database records. It checks pending confirmation every three seconds for up to two minutes, then offers a manual status check. An exited checkout can resume the same reservation without creating a second checkout.
 6. In Stripe, inspect the event destination delivery and verify a successful response. Replay the same event: no duplicate booking or payment record should be created.

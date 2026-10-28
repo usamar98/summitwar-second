@@ -46,6 +46,6 @@ export function completedDemo(now=Date.now()){
  }
  const matches=[match('quarterfinal-1',1,1,1,2,412,286),match('quarterfinal-2',1,2,3,4,354,312),match('quarterfinal-3',1,3,5,6,298,342),match('quarterfinal-4',1,4,7,8,361,337),match('semifinal-1',2,1,1,3,522,418),match('semifinal-2',2,2,6,7,407,463),match('final',3,1,1,7,684,526)];
  const scores=Object.fromEntries(matches.map(match=>[match.id,{a:match.score_a!,b:match.score_b!}]));
- const slots:PromotionSlot[]=PROMOTION_SLOTS.map((slot,index)=>({...slot,state:'paid',name:sponsors[index].name,url:sponsors[index].url,tagline:sponsors[index].tagline,logo_url:sponsors[index].logo_url}));
+ const slots:PromotionSlot[]=PROMOTION_SLOTS.map((slot,index)=>({...slot,price:10100,minimum_bid:10100,current_amount:10000,state:'paid',name:sponsors[index].name,url:sponsors[index].url,tagline:sponsors[index].tagline,logo_url:sponsors[index].logo_url}));
  return {tournament,entries,matches,scores,slots,winner:entrants[0],projects:[...entrants,...sponsors],spotlightEnd:iso(finalEnd+12*3600000),serverNow:iso(now)};
 }

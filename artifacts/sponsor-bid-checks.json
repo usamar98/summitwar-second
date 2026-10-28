@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "migrations": 11,
+  "checks": [
+    "opening $100 bids, custom per-card amounts, exact payment totals, idempotent requests and immutable contracts",
+    "same-price and under-$1 takeovers rejected; exact $1 and higher bids accepted; current ad survives pending checkout and webhook replay",
+    "overlapping or refunded late payments do not displace the verified current sponsor",
+    "successor start hides old ads without cron, rejects late payment, clears pointers, resets new cards to $100 and never resurrects archived sponsors",
+    "private records and bidding commands remain inaccessible to browser roles"
+  ],
+  "scope": "Isolated embedded PostgreSQL fixtures only. No hosted records or Stripe objects created. Embedded requests are serialized; independent hosted connection races are not simulated."
+}

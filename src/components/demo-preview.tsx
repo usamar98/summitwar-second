@@ -20,11 +20,11 @@ export function DemoPreview({projects,entries,matches,children}:{projects:Produc
  const [detail,setDetail]=useState<Detail|null>(null);
  function inspect(event:MouseEvent<HTMLDivElement>){
   if(!(event.target instanceof Element))return;
-  if(event.target.closest('.promotion-book')){event.preventDefault();event.stopPropagation();setDetail({key:'sample-takeover',title:'Overtake a sponsor card',body:'Every card costs $100. On the live tournament, verified payment replaces the sponsor on the cards you choose. The existing ad stays visible during checkout. These sample cards do not accept payments.'});return}
+  if(event.target.closest('.promotion-book')){event.preventDefault();event.stopPropagation();setDetail({key:'sample-takeover',title:'Overtake a sponsor card',body:'Empty cards start at $100. Takeovers require at least $1 more than the current sponsor paid per card, or a higher amount you choose. All sponsors expire before the next tournament. On the live tournament, verified payment replaces the sponsor on the cards you choose. The existing ad stays visible during checkout. These sample cards do not accept payments.'});return}
   const anchor=event.target.closest('a');
   if(anchor){
    const url=new URL(anchor.href,location.href);
-   if(url.pathname==='/promote'){event.preventDefault();event.stopPropagation();setDetail({key:'sample-sponsors',title:'Six sample sponsor places',body:'Every sponsor card costs $100. Any sponsor can overtake an existing card after verified payment. This preview shows all six filled. Visit the live tournament to book a real placement.'});return}
+   if(url.pathname==='/promote'){event.preventDefault();event.stopPropagation();setDetail({key:'sample-sponsors',title:'Six sample sponsor places',body:'Empty cards start at $100. Takeovers start at $1 more than the current per-card bid, with higher bids allowed. All sponsor cards reset before the next tournament. This preview shows all six filled. Visit the live tournament to book a real placement.'});return}
    let product=projects.find(project=>url.pathname===`/products/${project.slug}`||url.pathname===`/api/outbound/${project.id}`||url.href===project.url||url.href===`${project.url}/`);
    if(url.pathname==='/champions/demo-edition-001')product=projects[0];
    const match=matches.find(match=>url.pathname===`/matches/${match.id}`);

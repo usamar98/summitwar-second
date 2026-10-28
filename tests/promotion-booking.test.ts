@@ -1,0 +1,15 @@
+import {beforeEach,expect,it,vi} from 'vitest';
+const mock=vi.hoisted(()=>({rpc:vi.fn(),checkout:vi.fn(),lookup:vi.fn()}));
+vi.mock('../src/lib/supabase',()=>({requireUser:async()=>({id:'founder'}),requireAdmin:async()=>{},rpc:mock.rpc}));
+vi.mock('../src/lib/site-metadata',()=>({publicUrl:()=>{},siteMetadata:mock.lookup}));
+vi.mock('../src/lib/promotion-payments',()=>({promotionCheckout:mock.checkout}));
+vi.mock('../src/lib/stripe-client',()=>({requireStripeCheckout:()=>{}}));
+import {POST} from '../src/app/api/promotions/route';
+const body={tournament:'11111111-1111-4111-8111-111111111111',request:'22222222-2222-4222-8222-222222222222',slots:[1,4],bids:{1:15100,4:25025},name:'New startup',url:'https://example.org'};
+const request=(value:unknown,origin='https://summitwar.lol')=>new Request('https://summitwar.lol/api/promotions',{method:'POST',headers:{origin,'content-type':'application/json'},body:JSON.stringify(value)});
+beforeEach(()=>{vi.clearAllMocks();mock.rpc.mockResolvedValue(body.request);mock.lookup.mockResolvedValue({tagline:'Fixture',favicon:'https://example.org/favicon.ico'});mock.checkout.mockResolvedValue('https://checkout.stripe.com/example')});
+it('passes chosen per-card bids to the locked reservation command',async()=>{const result=await POST(request(body));expect(result.status).toBe(200);expect(mock.rpc).toHaveBeenCalledWith('reserve_promotion',expect.objectContaining({p_slots:[1,4],p_bids:{1:15100,4:25025},p_request:body.request}));expect(mock.checkout).toHaveBeenCalledWith(body.request)});
+it('rejects missing, extra, fractional and sub-opening bids before website lookup',async()=>{for(const bids of [undefined,{1:15100},{1:15100,4:25025,6:10000},{1:15100,4:10000.1},{1:15100,4:9999}])expect((await POST(request({...body,bids}))).status).toBe(400);expect(mock.lookup).not.toHaveBeenCalled();expect(mock.checkout).not.toHaveBeenCalled()});
+it('rejects duplicate positions and combined amounts over the checkout limit',async()=>{expect((await POST(request({...body,slots:[1,1],bids:{1:10000}}))).status).toBe(400);expect((await POST(request({...body,bids:{1:99999999,4:10000}}))).status).toBe(400);expect(mock.lookup).not.toHaveBeenCalled()});
+it('surfaces a database minimum increase without opening checkout',async()=>{mock.rpc.mockImplementation(async(name:string)=>{if(name==='reserve_promotion')throw new Error('Card 1 needs a bid of at least $151.00 USD')});const response=await POST(request({...body,bids:{1:15000,4:25025}}));expect(response.status).toBe(400);expect((await response.json()).error).toContain('$151.00');expect(mock.checkout).not.toHaveBeenCalled()});
+it('rejects a different origin before authentication or reservation',async()=>{expect((await POST(request(body,'https://other.example'))).status).toBe(403);expect(mock.rpc).not.toHaveBeenCalled()});

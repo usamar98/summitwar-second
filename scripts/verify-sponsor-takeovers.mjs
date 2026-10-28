@@ -10,7 +10,7 @@ try{
  await sql.exec(`create schema auth;create role anon;create role authenticated;create role service_role;
  create table auth.users(id uuid primary key,email_confirmed_at timestamptz,raw_app_meta_data jsonb default '{}',created_at timestamptz default now()-interval '2 days');
  create function auth.uid() returns uuid language sql as 'select null::uuid';`);
- const files=fs.readdirSync('supabase/migrations').filter(file=>file.endsWith('.sql')).sort();
+ const files=fs.readdirSync('supabase/migrations').filter(file=>file.endsWith('.sql')&&file<='20261028161134_free_entries_sponsor_takeovers.sql').sort();
  for(const file of files.slice(0,-1))await sql.exec(fs.readFileSync('supabase/migrations/'+file,'utf8').replace('create extension if not exists pgcrypto;',''));
  const actor=async()=>{const id=randomUUID();await q('insert into auth.users(id,email_confirmed_at) values($1,now())',[id]);return id};
  const admin=await actor();await q('insert into admin_roles values($1)',[admin]);

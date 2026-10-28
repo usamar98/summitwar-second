@@ -17,8 +17,8 @@ export function paymentState(kind:PaymentKind,booking:Booking,now=Date.now()):Pa
  }
  if(booking.status==='removed'||booking.status==='rejected'||booking.status==='waitlisted')return result('removed','This booking is unavailable.','Check your dashboard for the organizer’s decision and any payment or refund updates.');
  if(kind==='promotion'){
-  if(booking.status==='superseded')return result('superseded','Your sponsor card was overtaken.','Another sponsor has replaced your placement. You can book a card again for $100.');
-  if(booking.status==='paid'&&paid)return result('confirmed','Your promotion is confirmed.','Your payment is verified. Your startup appears until another sponsor overtakes the card or the tournament ends.');
+  if(booking.status==='superseded')return result('superseded','Your sponsor card was overtaken.','Another sponsor has replaced your placement. You can bid again at the current minimum or higher.');
+  if(booking.status==='paid'&&paid)return result('confirmed','Your promotion is confirmed.','Your payment is verified. Your startup appears until overtaken, this edition ends or the next tournament starts, whichever is first.');
   if(booking.status==='expired'||booking.reserved_until&&Date.parse(booking.reserved_until)<=now)return result('expired',paid?'Your promotion has ended.':'Your reservation has ended.',paid?'This paid placement has reached the end of its tournament.':'If a late payment arrives after another buyer takes a selected card, it will be refunded. You can choose an available card for a new booking.');
   return result('pending','Waiting for payment confirmation.','This page updates automatically when Stripe confirms your payment. You can safely return to your dashboard while confirmation is pending.',booking.status==='pending');
  }

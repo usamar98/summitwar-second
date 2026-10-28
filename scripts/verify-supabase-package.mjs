@@ -31,7 +31,7 @@ try{
  checks.push('repeat installation refuses safely and preserves existing tables/counter');
  await sql.exec(read('02_storage.sql'));await sql.exec(read('02_storage.sql'));
  assert.equal((await q("select count(*)::int n from pg_policies where schemaname='storage' and policyname='Public product media reads'"))[0].n,1);
- await sql.exec(read('04_verify.sql'));checks.push('33 tables, RLS, private permissions, 40 command names, current prices and media configuration verified');
+ await sql.exec(read('04_verify.sql'));checks.push('33 tables, RLS, private permissions, 41 command names, current prices and media configuration verified');
  await sql.exec('grant select on public.votes to anon');
  await rejected(read('04_verify.sql'),/Private table votes is readable by anon/);await sql.exec('revoke select on public.votes from anon');
  await sql.exec('alter table public.promotion_orders disable row level security');
@@ -67,8 +67,8 @@ try{
  await assert.rejects(q("select cast_guest_vote($1,$2,$3,$4,$5,'test_builder')",[m.id,m.entry_b,voter,token,network]));
  assert.equal((await q('select count(*)::int n from votes where match_id=$1',[m.id]))[0].n,1);
  assert.ok((await q('select used_at from voting_links where match_id=$1',[m.id]))[0].used_at);checks.push('guest voting records one final vote and consumes its single-use link without an email account');
- const order=randomUUID();await q('select reserve_promotion($1,$2,$3,$4,$5)',[admin,t.id,[1,2,3,4,5,6],order,{name:'Fixture sponsor',url:'https://example.org',tagline:'Fixture placement',logo_url:'https://example.org/favicon.ico'}]);
- const booking=(await q('select amount,pricing_version from promotion_orders where id=$1',[order]))[0];assert.deepEqual(booking,{amount:60000,pricing_version:3});
+ const order=randomUUID();await q('select reserve_promotion($1,$2,$3,$4,$5,$6)',[admin,t.id,[1,2,3,4,5,6],order,{name:'Fixture sponsor',url:'https://example.org',tagline:'Fixture placement',logo_url:'https://example.org/favicon.ico'},{1:10000,2:10000,3:10000,4:10000,5:10000,6:10000}]);
+ const booking=(await q('select amount,pricing_version from promotion_orders where id=$1',[order]))[0];assert.deepEqual(booking,{amount:60000,pricing_version:4});
  await assert.rejects(q('select reserve_promotion($1,$2,$3,$4,$5)',[entrants[0],t.id,[1],randomUUID(),{name:'Other fixture',url:'https://example.net',tagline:'Fixture'}]));
  assert.equal((await q("select fulfill_promotion('fixture-event','checkout.session.completed',$1,'fixture-checkout','fixture-intent',60000,'usd') result",[order]))[0].result,'paid');
  assert.ok((await q('select promotion_inventory($1) result',[t.id]))[0].result.every(s=>s.state==='paid'));checks.push('all six sponsor cards cost $600, reserve one checkout at a time and publish only after verified payment fulfillment');
