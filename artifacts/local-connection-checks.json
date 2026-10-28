@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-10-28T10:58:48.750Z",
+  "base": "http://localhost:3000",
+  "checks": [
+    {
+      "name": "Homepage and server-key privacy",
+      "passed": true
+    },
+    {
+      "name": "Live API connected to Supabase",
+      "passed": true
+    },
+    {
+      "name": "Cloudflare local verification reaches the database; missing match rejected",
+      "passed": true
+    },
+    {
+      "name": "Unsigned webhook rejected; correctly signed local test event accepted",
+      "passed": true
+    }
+  ],
+  "scope": "No votes, users, purchases, or tournaments are created. The signature event is a local test fixture."
+}

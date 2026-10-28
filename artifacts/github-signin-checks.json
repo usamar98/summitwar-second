@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-10-28T11:07:16.327Z",
+  "project": "sisnzrnlsqgippnssnij",
+  "organization": "lol library",
+  "githubProviderEnabled": true,
+  "allowedCallbacks": [
+    "http://localhost:3000/auth/callback",
+    "https://summitwar.lol/auth/callback"
+  ],
+  "browserChecks": {
+    "githubAuthorization": true,
+    "supabaseCallback": true,
+    "protectedDashboard": true,
+    "sessionSurvivesReload": true
+  },
+  "scope": "Authorized real GitHub founder login. No tournament entry, vote, purchase or email sign-in request was submitted."
+}

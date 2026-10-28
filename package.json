@@ -6,6 +6,7 @@
     "test": "vitest run",
     "db:package": "node scripts/package-supabase.mjs",
     "payments:check": "node scripts/check-payments.mjs",
+    "stripe:listen": "node scripts/stripe-local.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -21,17 +22,18 @@
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.117.3",
     "@tailwindcss/postcss": "4.3.3",
-    "next": "16.4.0",
+    "next": "16.4.3",
     "playwright-core": "1.64.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "stripe": "23.0.0",
     "tailwindcss": "4.3.3",
-    "zod": "4.6.5"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.8",
     "@playwright/test": "1.64.0",
+    "@stripe/cli": "1.55.1",
     "@types/node": "26.6.5",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",

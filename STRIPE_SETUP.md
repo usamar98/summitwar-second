@@ -54,6 +54,26 @@ No new receipt-email workflow is implemented by the app. Stripe's own optional r
 
 Vercel settings do not populate the local `.env.local` file. For local payment testing, put separate test settings in that file. Set `NEXT_PUBLIC_APP_URL=http://localhost:3000`. Keep local/test secrets separate from live Production secrets.
 
+The project includes a test-only local webhook runner:
+
+```powershell
+npm install
+npm run stripe:listen
+```
+
+It loads the test API key from `.env.local`, obtains the signing secret for this local listener, saves it privately as `STRIPE_WEBHOOK_SECRET`, and forwards the required events. It rejects live keys and hides secrets in terminal output. Keep it running and start `npm run dev` in another terminal. `npm run stripe:listen -- --prepare` saves the signing secret without starting forwarding. A local signing secret is separate from your deployed webhook destination's secret.
+
+For local guest voting, the documented Cloudflare test pair is supported only while `NODE_ENV=development` and the request hostname is `localhost`, `127.0.0.1`, or `[::1]`:
+
+```dotenv
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+```
+
+These are public test fixtures, not private credentials. Cloudflare still validates the dummy token. Test responses omit the real host/action, so this development case has its own validation; production and non-loopback requests reject this pair. Production needs real Cloudflare keys. Vote records and single-use link rules continue to use the connected database. See [Cloudflare's testing guide](https://developers.cloudflare.com/turnstile/troubleshooting/testing/).
+
+Founder sign-in requires the GitHub provider enabled in Supabase with a GitHub OAuth app callback of `https://YOUR-PROJECT.supabase.co/auth/v1/callback`. Save the OAuth client ID and secret in Supabase's GitHub provider settings; the app needs no additional GitHub environment variables. Add `http://localhost:3000/auth/callback` and the exact deployed `/auth/callback` URL to Supabase's allowed redirect URLs. Keep the Site URL set to the deployed origin. Local `.env.local` must use `NEXT_PUBLIC_APP_URL=http://localhost:3000`; Vercel must use the deployed origin. Signing in does not grant organizer privileges; use the existing admin setup for your own account.
+
 After installing and signing into the official Stripe CLI, forward **snapshot** events:
 
 ```powershell

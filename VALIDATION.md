@@ -1,5 +1,15 @@
 # Completed local checks
 
+## GitHub sign-in and security patches — 28 October 2026
+
+- Upgraded the pinned Next.js dependency from 16.4.0 to 16.4.3 and Zod from 4.6.5 to 4.6.7. The final npm audit reports zero vulnerabilities. Version and audit evidence is in `artifacts/security-upgrade-checks.json`.
+- TypeScript passed, the optimized production build generated every route successfully, and 35 focused regression tests passed across eight files covering voting, metadata, checkout, payment status, Stripe configuration and webhook signatures.
+- Enabled GitHub in the existing `summitwarsecond` Supabase project in the `lol library` organization. Replaced one explicitly approved unused OAuth secret and saved the replacement directly in Supabase. Verified the exact localhost and production callback allowlists; GitHub credentials do not belong in public application environment variables.
+- Verified the real browser flow from `/login` through GitHub authorization, Supabase callback and the protected `/dashboard`. The signed-in dashboard survived a reload. This authorized check created a real founder account; it submitted no tournament entry, vote or purchase. Screenshots are `artifacts/github-provider-enabled.png` and `artifacts/github-signin-dashboard.png`.
+- Local HTTP checks passed against the connected services: homepage rendering and server-key privacy, the Supabase live API, Cloudflare's guarded development test challenge reaching the database, missing-match rejection, unsigned webhook rejection and acceptance of a correctly signed local fixture. These are recorded in `artifacts/local-connection-checks.json`; the webhook fixture does not claim a completed Stripe purchase.
+- The test-only Stripe listener is available through `npm run stripe:listen`. Its signing secret is saved privately in `.env.local`. Cloudflare dummy keys remain rejected outside loopback development. The database currently has no tournament, so a real tournament vote and purchase were not exercised.
+- An initial npm install exhausted C:'s download cache. Retrying with `--cache .npm-cache` on D: succeeded; clearing npm's disposable C: cache restored disk space. Private environment files and the temporary OAuth recovery file are excluded from Git.
+
 ## Completed tournament visual preview
 
 - Added a separate, noindex `/demo` page using the actual winner hero, paid sponsor cards, completed bracket, tournament watch and champion participant row. All projects, sponsorships and vote counts are explicitly labeled fictional. Fixture creation is in memory; no database rows or purchases are created.
