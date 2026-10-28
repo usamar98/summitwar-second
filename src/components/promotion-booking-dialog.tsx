@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useRef,type KeyboardEvent} from 'react';
 import {Cross2Icon} from '@radix-ui/react-icons';
-import {PROMOTION_SLOTS,type PromotionSlot} from '@/lib/promotion-slots';
+import {PROMOTION_SLOTS,canBookPromotion,type PromotionSlot} from '@/lib/promotion-slots';
 import {PromotionForm} from './promotion-form';
 import {LocalTime} from './widgets';
 
@@ -31,13 +31,14 @@ export function PromotionBookingDialog({position,tournament,edition,ends,slots,s
  return <dialog ref={dialog} className="promotion-dialog" aria-labelledby="promotion-dialog-title" aria-describedby="promotion-dialog-description" onKeyDown={keepDialogFocus} onCancel={event=>{event.preventDefault();onClose()}} onClick={event=>{if(event.target===event.currentTarget)onClose()}}>
   <div className="promotion-dialog-content">
    <div className="promotion-dialog-heading"><div><p className="eyebrow">SPONSOR BY</p><h2 id="promotion-dialog-title">{placement.label} card</h2></div><button type="button" className="drawer-close" aria-label="Close sponsor details" onClick={onClose}><Cross2Icon width={22} height={22}/></button></div>
-   <p className="promotion-dialog-price">${placement.price/100}<span>USD · one tournament</span></p>
+   <p className="promotion-dialog-price">${placement.price/100}<span>USD · one placement</span></p>
    <p id="promotion-dialog-description">Show your startup beside the community winner in this {placement.label.toLowerCase()} placement.</p>
    {edition&&ends?<p className="promotion-dialog-edition">Edition #{edition} · Ends <LocalTime value={ends}/></p>:<p className="promotion-dialog-edition">Booking opens with the next published tournament.</p>}
    {reserved&&<p className="notice">This card is reserved while another checkout finishes.</p>}
-   {enabled&&!reserved&&slot?.state!=='available'&&<p className="notice">This card is currently unavailable for booking.</p>}
+   {slot?.state==='paid'&&<p className="notice">Currently sponsored by <strong>{slot.name||'another startup'}</strong>. Pay $100 to take this card after payment verification.</p>}
+   {enabled&&!reserved&&!canBookPromotion(slot)&&<p className="notice">Booking is temporarily unavailable. Another checkout may be finishing, or booking has closed.</p>}
    <PromotionForm tournament={tournament} slots={slots} signedIn={signedIn} enabled={enabled} fixedSlot={position}/>
-   <p className="promotion-dialog-terms">Your placement appears after payment is verified and ends with this tournament’s winner spotlight. Sponsorship does not add votes or enter the competition.</p>
+   <p className="promotion-dialog-terms">Your placement appears after verified payment and lasts until another sponsor overtakes it or this tournament’s winner spotlight ends. Sponsorship does not add votes or enter the free competition.</p>
   </div>
  </dialog>;
 }

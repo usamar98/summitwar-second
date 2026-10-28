@@ -16,8 +16,7 @@ export async function POST(req:Request){
     product={...p,x_handle:p.x_handle||null,tagline:metadata.tagline,logo_url:`${new URL(req.url).origin}/api/site-icon?url=${encodeURIComponent(metadata.favicon)}`,slug:`${p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')}-${randomUUID().slice(0,8)}`};
    }else existing=uuid.parse(body.product);
    const admission=await rpc('submit_application',{p_actor:u.id,p_tournament:uuid.parse(body.tournament),p_product:product,p_slot:slot,p_existing:existing});
-   let checkoutUrl=null,checkoutError=null;if(admission.fee>0&&admission.status==='approved'){try{checkoutUrl=await checkout(admission.entry)}catch(e){checkoutError=e instanceof Error?e.message:'Could not start checkout';}}
-   result={...admission,checkoutUrl,checkoutError};
+   result=admission;
   }
   else if(body.action==='vote')throw new Error('Create a single-use voting link from the match page');
   else if(['follow','save','reply','read'].includes(body.action)){if(body.enabled!==undefined&&typeof body.enabled!=='boolean')throw new Error('Invalid preference');await rpc('community_command',{p_actor:u.id,p_action:body.action,p_product:body.product?uuid.parse(body.product):null,p_target:body.target?uuid.parse(body.target):null,p_body:body.action==='reply'?String(body.text||'').trim().slice(0,1500):null,p_enabled:body.enabled!==false});}

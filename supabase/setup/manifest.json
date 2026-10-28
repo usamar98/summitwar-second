@@ -1,6 +1,6 @@
 {
-  "schemaVersion": "20261017104639",
-  "migrationCount": 9,
+  "schemaVersion": "20261028161134",
+  "migrationCount": 10,
   "tables": [
     "admin_roles",
     "analytics_events",
@@ -47,6 +47,7 @@
     "cast_vote",
     "claim_screenshot",
     "community_command",
+    "free_tournament_entry",
     "fulfill_payment",
     "fulfill_promotion",
     "issue_voting_link",
@@ -78,13 +79,13 @@
     "tick_before_submission"
   ],
   "files": {
-    "01_install.sql": "b4eafcec928a66be6486e7d068acde665734099ab2698d7f8bff6e3b0eaad3f6",
+    "01_install.sql": "7cafe189553fdf6f9b3eefb484212fed378fb57cbe7bf0e1bc2afa3a43cf5dc7",
     "02_storage.sql": "41d8e48d8891866975f4ae3e33d0c8b98b0d3ebe57818e1e4635cf53aac80613",
     "03_admin.sql": "946d76c38ab1af2fcb952353a9b729e238f3f4ca9112d521b80aa65fdcf79cf6",
-    "04_verify.sql": "dd5c1df6e2c80d77621e6879fa0e299a295a5934f603ad1c24e76b2a1ccae340",
+    "04_verify.sql": "6dc1a7507bb1434646ea2043cf3a23422377f709b1d3d591853887c37de769c9",
     "05_scheduler.sql": "fdb8ac73514ae927c7817663a4a3eb61606549119b05895e17148d37efc99d69",
     "app.env.example": "8787c5fecf860b8a59d898693d80bf96703b16d5402cf67131271bbbc860793c",
-    "EXISTING_DATABASE.md": "24799c03d8a7555f18f26a859059edf54c0d0443f215279e616e2e53a0a6f1a3",
+    "EXISTING_DATABASE.md": "fa1a7afb1c166f9e3cce92ffa8e3bfda5102ff8b1007c9a6586c5bb39eeb7a8d",
     "migrations/20261011160707_summitwar.sql": "e35024b3e28713fa974a8e10700d3aeb942020c729051757d4421b50fc635b92",
     "migrations/20261011172940_simplify_submissions.sql": "5fa221d3dc9e20bfe5a37042421f1c8c69720d5fc117770c14db28a2160ffa4a",
     "migrations/20261011184518_visitor_presence.sql": "f8452de2c06502264e1d4890abdce00ba55e3ee4163accd8e042810ae58729ed",
@@ -94,6 +95,7 @@
     "migrations/20261015102148_guest_voting.sql": "4701b5ef1692be7386fa836d8c2410239acae144e72d8d8412f22ecf7becb016",
     "migrations/20261017101030_paid_promotions.sql": "85581dac23dcf1fa979fa8a59b537dc8e466722ca443d27ebe1f3258d35225c9",
     "migrations/20261017104639_reset_promotion_prices.sql": "d30107132ea9ca20f475ae6106f9acd97ac5d21c9d17119f7f8d6d5c73c976e8",
-    "START_HERE.md": "5ed672654059ee39d4031c959837b1b99602d5309a6f636398e9afc1fe0f3ed5"
+    "migrations/20261028161134_free_entries_sponsor_takeovers.sql": "c7fba1e55c1ec12a61b4aa15442fd96a8a39268e17ac145ab689b02f9d565fb9",
+    "START_HERE.md": "29e255d8b10ef35d6c1b22820c8bd0cfb89d275e742c40c9092139f31142fd52"
   }
 }

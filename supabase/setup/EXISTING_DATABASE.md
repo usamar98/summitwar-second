@@ -10,11 +10,12 @@ Use the files in `migrations/` only for database changes you have not already ap
 6. `20261012191709_extended_tournament_schedule.sql` — 24-hour quarterfinals, 24-hour semifinals, 12-hour final and 12-hour spotlight.
 7. `20261015102148_guest_voting.sql` — email-free guest votes and single-use voting links.
 8. `20261017101030_paid_promotions.sql` — six exclusive paid sponsor cards, payment verification and refunds.
-9. `20261017104639_reset_promotion_prices.sql` — current $70/$50/$30 prices, preserving existing bookings.
+9. `20261017104639_reset_promotion_prices.sql` — historical $70/$50/$30 prices, preserving earlier bookings.
+10. `20261028161134_free_entries_sponsor_takeovers.sql` — permanent free entry, $100 sponsor cards and safe paid takeovers.
 
-If you previously ran only the first six migrations, start at number 7. If you already installed all nine, run `04_verify.sql`; no repeat installation is needed. SQL migration files are one-time changes and must not be replayed over their own tables/functions. Take a database backup before updating an existing deployment.
+If you previously ran only the first six migrations, start at number 7. If you already installed the first nine, apply only migration 10, then run `04_verify.sql`. If all ten are installed, run verification without replaying migrations. SQL migration files are one-time changes and must not be replayed over their own tables/functions. Take a database backup before updating an existing deployment.
 
-If you do not know which files were applied, review your SQL Editor history and run `04_verify.sql`. A verification error identifies a missing object or setting; it is not authorization to delete existing tables. Compare the migration contents with the existing database before choosing a starting point. Do not guess by running all nine again.
+If you do not know which files were applied, review your SQL Editor history and run `04_verify.sql`. A verification error identifies a missing object or setting; it is not authorization to delete existing tables. Compare the migration contents with the existing database before choosing a starting point. Do not guess by running all ten again.
 
 For installations managed by the Supabase CLI, keep using the repository's `supabase/migrations/` folder and its tracked migration history. Use `supabase migration list` and the normal `supabase db push` workflow after linking the correct project. This download also includes those same migration files.
 

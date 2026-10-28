@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "migrations": 10,
+  "checks": [
+    "historical sponsor checkout keeps its agreed amount",
+    "existing editions become free; late entry charges queue refunds without releasing the free application",
+    "six $100 cards total $600; unpaid details stay hidden; reservations and webhook replay are protected",
+    "verified payment swaps only selected cards, keeps the current ad during checkout, records full takeovers and never restores a displaced ad on replay",
+    "abandoned, overlapping, refunded and late replacement payments cannot remove the current sponsor",
+    "later editions, organizer publication and automatic pre-entry stay free; eight founder capacity, uniqueness and review remain enforced",
+    "private sponsorship records and booking commands remain inaccessible to browser roles"
+  ],
+  "scope": "Isolated embedded PostgreSQL; no production fixtures, Stripe objects, charges or refunds. Requests are serialized by the embedded engine; hosted independent-connection contention remains outside this check."
+}

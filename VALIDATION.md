@@ -1,5 +1,16 @@
 # Completed local checks
 
+## Free entry and $100 sponsor takeovers, 28 October 2026
+
+- Every tournament and pre-entry is free. A database trigger normalizes organizer publication, scheduler-created editions and server inserts to zero entry fees. Legacy entry checkout is disabled; a late legacy charge queues a refund without releasing the free application.
+- All six sponsor cards cost $100 each, or $600 together. Separate pending reservations keep the current ad visible while replacement checkout runs. Verified payment atomically replaces only the selected cards. Overlapping reservations, expired claims, refunds and duplicate webhook delivery cannot displace the wrong sponsor. Booking history records fully overtaken orders; being overtaken does not automatically refund a completed placement.
+- All **111 tests across 21 files** passed. The optimized Next.js build, including TypeScript and every route, passed. The first sandboxed build could not start a CSS worker; the successful build used ordinary worker access and the project's low-memory settings.
+- `scripts/verify-sponsor-takeovers.mjs` passed all ten migrations in isolated embedded PostgreSQL, including historical price preservation, partial/full takeovers, late/refunded payments, free later editions and automatic successors, eight-founder limits and private command access. Embedded requests are serialized; no hosted independent-connection race is claimed.
+- The updated Supabase installer passed fresh installation and private-access verification. The package includes ten migrations, 33 tables and 40 command names. Its SQL, checksums and downloadable ZIP were regenerated.
+- Applied `20261028161134_free_entries_sponsor_takeovers.sql` to the authorized `summitwarsecond` project. Read-only verification confirmed six prices of 10,000 cents, pricing version 3, the replacement reservation column and the permanent free-entry trigger. No live tournament, project, vote, order, charge or refund was created for these checks.
+- Browser inspection of the production build verified all six $100 empty cards, the in-page dialog and takeover disclosure, the free-entry call to action, and all six takeover actions in the clearly labelled fictional completed-tournament demo. Current screenshots are `artifacts/sponsor-100-dialog.png` and `artifacts/sponsor-100-filled-preview.png`.
+- The live Stripe restricted key remains a user-handled setup step. No successful live purchase or actual sponsor replacement is claimed.
+
 ## GitHub sign-in and security patches — 28 October 2026
 
 - Upgraded the pinned Next.js dependency from 16.4.0 to 16.4.3 and Zod from 4.6.5 to 4.6.7. The final npm audit reports zero vulnerabilities. Version and audit evidence is in `artifacts/security-upgrade-checks.json`.

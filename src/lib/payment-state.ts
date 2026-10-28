@@ -1,5 +1,5 @@
 export type PaymentKind='entry'|'promotion';
-export type PaymentState={state:'pending'|'confirmed'|'review'|'refund_pending'|'refunded'|'disputed'|'expired'|'removed';title:string;description:string;amount:number;canResume:boolean};
+export type PaymentState={state:'pending'|'confirmed'|'review'|'refund_pending'|'refunded'|'disputed'|'expired'|'removed'|'superseded';title:string;description:string;amount:number;canResume:boolean};
 type Payment={status:string;checkout_id?:string|null};
 type Booking={status:string;payments?:Payment[];amount?:number;reserved_until?:string;review_status?:string;tournament?:{fee_amount_cents:number};reservations?:{released:boolean;expires_at:string;checkout_id?:string|null}[]};
 
@@ -17,13 +17,14 @@ export function paymentState(kind:PaymentKind,booking:Booking,now=Date.now()):Pa
  }
  if(booking.status==='removed'||booking.status==='rejected'||booking.status==='waitlisted')return result('removed','This booking is unavailable.','Check your dashboard for the organizer’s decision and any payment or refund updates.');
  if(kind==='promotion'){
-  if(booking.status==='paid'&&paid)return result('confirmed','Your promotion is confirmed.','Your payment is verified. Your startup will appear in the cards you booked while this tournament is featured.');
+  if(booking.status==='superseded')return result('superseded','Your sponsor card was overtaken.','Another sponsor has replaced your placement. You can book a card again for $100.');
+  if(booking.status==='paid'&&paid)return result('confirmed','Your promotion is confirmed.','Your payment is verified. Your startup appears until another sponsor overtakes the card or the tournament ends.');
   if(booking.status==='expired'||booking.reserved_until&&Date.parse(booking.reserved_until)<=now)return result('expired',paid?'Your promotion has ended.':'Your reservation has ended.',paid?'This paid placement has reached the end of its tournament.':'If a late payment arrives after another buyer takes a selected card, it will be refunded. You can choose an available card for a new booking.');
   return result('pending','Waiting for payment confirmation.','This page updates automatically when Stripe confirms your payment. You can safely return to your dashboard while confirmation is pending.',booking.status==='pending');
  }
  if(booking.status==='confirmed'&&(paid||amount===0))return booking.review_status==='approved'?result('confirmed','You’re in.',amount===0?'Your free entry is confirmed.':'Your payment is verified and your tournament place is confirmed.'):result('review',amount===0?'Your entry is awaiting review.':'Payment verified. Review pending.','Your place is reserved. The organizer will review your app before it enters voting.');
  const active=booking.reservations?.some(r=>!r.released&&Date.parse(r.expires_at)>now);
- if(amount===0&&active)return result('review','Your free entry is awaiting review.','The organizer will review your app. No payment is required for the first edition.');
+ if(amount===0&&active)return result('review','Your free entry is awaiting review.','The organizer will review your app. No payment is required in any edition.');
  if(!active&&!paid)return result('expired','Your reservation has ended.','Open your dashboard to reclaim an available place for the same app. A payment that cannot secure a place will be refunded.');
- return result('pending','Waiting for payment confirmation.','This page updates automatically after your payment is verified. Completing a redirect alone does not confirm a payment.',booking.status==='approved'&&Boolean(active));
+ return result('pending','Waiting for payment confirmation.','This page updates automatically after your payment is verified. Completing a redirect alone does not confirm a payment.',false);
 }

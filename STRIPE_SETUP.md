@@ -1,6 +1,6 @@
 # Connect your Stripe account to SummitWar
 
-SummitWar uses Stripe-hosted card checkout for two separate purchases: $5 tournament entries from edition #2 onward, and sponsor cards at $70/$50/$30 per side ($300 for all six). Edition #1 entry stays free. Prices come from the database/server, and only verified payments can confirm bookings. No Stripe Product or Price IDs need to be created manually.
+SummitWar uses Stripe-hosted card checkout only for optional sponsor cards: $100 each, or $600 for all six. Tournament entry is permanently free in every edition. Prices come from the database/server, and only verified payments can confirm bookings. No Stripe Product or Price IDs need to be created manually.
 
 ## Production settings in Vercel
 
@@ -12,7 +12,7 @@ Open the Vercel project **summitwar-second** (serving `summitwar.lol`) → Setti
 | `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Your Supabase publishable key |
 | `SUPABASE_SERVICE_ROLE_KEY` | Your private Supabase secret/server key |
-| `STRIPE_SECRET_KEY` | Stripe Dashboard → API keys → secret key; use `sk_test_...` while testing |
+| `STRIPE_SECRET_KEY` | Stripe Dashboard → API keys → restricted key with Checkout Sessions Write, Payment Intents Read, and Charges/Refunds Write; use a separate test/sandbox key while testing |
 | `STRIPE_WEBHOOK_SECRET` | The `whsec_...` signing secret for the webhook destination below |
 
 The two Stripe values and the Supabase server key are private server settings. Mark them Secret/Sensitive in Vercel. Do not put them in `NEXT_PUBLIC_` settings or send them through chat. No Stripe publishable key is required for this hosted-checkout integration.
@@ -40,9 +40,9 @@ Copy that destination's signing secret into Vercel's `STRIPE_WEBHOOK_SECRET`, sa
 
 Use Stripe test keys, with a signed-in founder account and a published tournament. Check the following flows:
 
-1. Edition #1 entry confirms after organizer approval without Stripe checkout.
-2. Edition #2 or later opens exactly $5 USD checkout on submission. Payment reserves the place, and organizer review remains required.
-3. Sponsor selection opens checkout for exactly the selected cards. One buyer can take all six for $300; other buyers cannot take occupied cards.
+1. Every edition confirms entry after organizer approval without Stripe checkout. Old entry checkout links must also refuse payment.
+2. Sponsor selection opens checkout at $100 per selected card, or $600 for all six.
+3. Book an occupied sponsor card. The old ad must stay visible until the replacement payment succeeds. Only selected cards change; another overlapping checkout must wait. A fully overtaken booking shows as overtaken, without an automatic refund.
 4. In test checkout, use `4242 4242 4242 4242`, a future expiry and any three-digit CVC. Use Stripe's documented test cards only while in test mode.
 5. The return page shows pending, verified, review, refund or expired status from your own database records. It checks pending confirmation every three seconds for up to two minutes, then offers a manual status check. An exited checkout can resume the same reservation without creating a second checkout.
 6. In Stripe, inspect the event destination delivery and verify a successful response. Replay the same event: no duplicate booking or payment record should be created.

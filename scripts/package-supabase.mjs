@@ -58,9 +58,11 @@ begin
  end loop;
  if not(select rolbypassrls from pg_roles where rolname='service_role') then raise exception 'Supabase service_role must have its platform BYPASSRLS capability';end if;
  if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='votes' and column_name='voter_hash') or not exists(select 1 from information_schema.columns where table_schema='public' and table_name='votes' and column_name='user_id' and is_nullable='YES') then raise exception 'Guest voting migration is missing';end if;
- if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='promotion_orders' and column_name='pricing_version' and column_default='2') then raise exception 'Promotion pricing version 2 default is missing';end if;
+ if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='promotion_orders' and column_name='pricing_version' and column_default='3') then raise exception 'Promotion pricing version 3 default is missing';end if;
  if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='tournaments' and column_name='extended_cycle' and column_default='true') then raise exception '24/24/12-hour tournament schedule default is missing';end if;
- if array(select public.promotion_price(g) from generate_series(1,6) g)<>array[7000,5000,3000,7000,5000,3000] then raise exception 'Sponsor prices do not match $70/$50/$30 per side';end if;
+ if array(select public.promotion_price(g) from generate_series(1,6) g)<>array[10000,10000,10000,10000,10000,10000] then raise exception 'Sponsor prices do not match $100 per card';end if;
+ if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='promotion_slots' and column_name='pending_order_id') then raise exception 'Sponsor takeover reservations are missing';end if;
+ if not exists(select 1 from pg_trigger where tgrelid='public.tournaments'::regclass and tgname='a_free_tournament_entry' and tgenabled='O') or exists(select 1 from public.tournaments where edition is not null and fee_amount_cents is distinct from 0) then raise exception 'Permanent free tournament entry is not installed';end if;
  if not exists(select 1 from storage.buckets where id='product-media' and public and file_size_limit=31457280 and allowed_mime_types @> array['image/png','image/jpeg','image/webp','video/mp4','video/webm']) then raise exception 'Run 02_storage.sql to configure product media';end if;
  if not exists(select 1 from pg_policies where schemaname='storage' and tablename='objects' and policyname='Public product media reads' and cmd='SELECT') then raise exception 'Product media read policy is missing';end if;
 end $$;

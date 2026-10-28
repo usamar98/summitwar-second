@@ -9,7 +9,7 @@ const browser=await chromium.launch({executablePath:process.env.BROWSER_EXECUTAB
 const page=await browser.newPage({viewport:{width:1440,height:1100}}),errors=[];
 page.on('pageerror',error=>errors.push(error.stack||error.message));
 const check=(ok,message)=>{if(!ok)throw Error(message)};
-const prices=[70,50,30,70,50,30],names=['Top left','Middle left','Bottom left','Top right','Middle right','Bottom right'];
+const prices=[100,100,100,100,100,100],names=['Top left','Middle left','Bottom left','Top right','Middle right','Bottom right'];
 async function checkCards(){
  const cards=page.locator('button.promotion-empty');
  await cards.first().waitFor({state:'visible'});
@@ -66,7 +66,7 @@ try{
  await page.goto(base+'/promote',{waitUntil:'load',timeout:60000});
  await page.locator('.promotion-selector input[type=checkbox]').first().waitFor({state:'visible'});
  check(await page.locator('.promotion-selector input[type=checkbox]').count()===6,'Multi-card purchase page must remain available');
- check(await page.getByText('All six cards: $300 USD.',{exact:false}).count()===1,'Combined $300 price missing');
+ check(await page.getByText('All six cards: $600 USD.',{exact:false}).count()===1,'Combined $600 price missing');
  await page.screenshot({path:artifact('promotions-purchase-desktop.png'),fullPage:true});
  await page.setViewportSize({width:390,height:844});
  await page.goto(base,{waitUntil:'load',timeout:60000});
