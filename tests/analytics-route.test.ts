@@ -1,0 +1,12 @@
+import {beforeEach,it,expect,vi} from 'vitest';
+const mock=vi.hoisted(()=>({record:vi.fn()}));
+vi.mock('../src/lib/analytics',()=>({record:mock.record}));
+import {POST} from '../src/app/api/analytics/route';
+const product='00000000-0000-4000-8000-000000000001';
+const request=(body:unknown,origin='https://summitwar.example')=>new Request('https://summitwar.example/api/analytics',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify(body)});
+beforeEach(()=>{vi.clearAllMocks();mock.record.mockResolvedValue(undefined)});
+it('preserves view recording for existing callers that omit kind',async()=>{expect((await POST(request({product}))).status).toBe(204);expect(mock.record).toHaveBeenCalledWith(expect.any(Request),product,'view')});
+it('records direct website clicks as outbound events',async()=>{expect((await POST(request({product,kind:'outbound'}))).status).toBe(204);expect(mock.record).toHaveBeenCalledWith(expect.any(Request),product,'outbound')});
+it('rejects unsupported event kinds and malformed product identifiers',async()=>{for(const body of [{product,kind:'purchase'},{product,kind:null},{product:'invalid',kind:'outbound'}])expect((await POST(request(body))).status).toBe(400);expect(mock.record).not.toHaveBeenCalled()});
+it('rejects cross-origin click recording',async()=>{expect((await POST(request({product,kind:'outbound'},'https://untrusted.example'))).status).toBe(403);expect(mock.record).not.toHaveBeenCalled()});
+it('returns a controlled error if analytics storage is unavailable',async()=>{mock.record.mockRejectedValue(new Error('Unavailable'));expect((await POST(request({product,kind:'outbound'}))).status).toBe(400)});

@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "directServerRenderedHref": "https://winner.example/",
+  "rel": "noopener noreferrer",
+  "trackingRedirect": false,
+  "tracking": "Separate same-origin keepalive POST; regular and middle clicks verified.",
+  "scope": "Isolated rendering and mocked analytics requests; no production product, click record, vote or payment created."
+}

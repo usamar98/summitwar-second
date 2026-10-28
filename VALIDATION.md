@@ -1,5 +1,11 @@
 # Completed local checks
 
+## Direct followable winner links, 28 October 2026
+
+- Winner startup and champion pages render the website URL directly in the server-rendered anchor. It uses `rel="noopener noreferrer"` with no `nofollow`, `sponsored` or nonstandard `dofollow` token. Tournament battle links retain their existing behavior.
+- Click statistics use a separate same-origin keepalive request. Normal and middle clicks are recorded without intercepting navigation; the direct link also works without JavaScript. The analytics API validates the event kind and product UUID, retains view recording as the default, and rejects cross-origin requests.
+- Fourteen focused tests across three files passed, covering click recording, validation and winner-only access. TypeScript and the optimized production build passed. An isolated component-render check verified the direct HTML destination, link attributes and separate click requests with mocked analytics; no live product, click, vote or payment record was created. Results are in `artifacts/winner-dofollow-checks.json`. No database migration is required.
+
 ## Rewards section and winner startup pages, 28 October 2026
 
 - Added the participant/winner rewards comparison immediately after the tournament and before participant rows on the homepage and fictional demo. Shared benefits, winner-only benefits and organizer-provided social promotion are identified explicitly. The entry call to action opens the existing submission sidebar.
