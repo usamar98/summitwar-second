@@ -4,7 +4,7 @@
 product
 
 ## Users and purpose
-Indie founders enter their startups in eight-app community tournaments. Visitors browse the contenders and cast final votes without voter sign-in. Founders and advertisers use protected accounts to manage entries and purchases. Organizers review entries, payments, suspicious votes and promotion fulfillment.
+Indie founders enter their startups in eight-app community tournaments. Visitors browse the contenders and cast guest votes without email sign-in. Each network gets one guest vote per match; additional voters on shared Wi-Fi verify with GitHub. Founders and advertisers use protected accounts to manage entries and purchases. Organizers review entries, payments, suspicious votes and promotion fulfillment.
 
 ## Brand and principles
 Competitive, direct and welcoming. The summit and shield identity comes from the existing app. Keep community winners distinct from paid promotion. Never fabricate entrants, traffic, winners or fulfilled purchases. Give users exact prices and deadlines before payment. Keep the existing dark green visual language and eight entrant colors.

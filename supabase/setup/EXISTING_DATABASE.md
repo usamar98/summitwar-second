@@ -13,10 +13,11 @@ Use the files in `migrations/` only for database changes you have not already ap
 9. `20261017104639_reset_promotion_prices.sql` — historical $70/$50/$30 prices, preserving earlier bookings.
 10. `20261028161134_free_entries_sponsor_takeovers.sql` — permanent free entry, $100 sponsor cards and safe paid takeovers.
 11. `20261028182344_sponsor_bids_and_edition_expiry.sql` — immutable per-card bids, minimum $1 takeover increments, custom higher bids and expiry before the next tournament.
+12. `20261029132229_harden_guest_voting.sql` — one guest vote per network/match, verified GitHub identity deduplication, network-bound links, request limits and private network claims. Grants the server only the Auth identity columns needed for voting; it does not expose emails or identity data.
 
-If you previously ran only the first six migrations, start at number 7. If you already installed the first nine, apply migrations 10 and 11, then run `04_verify.sql`. If the first ten are installed, apply only migration 11. If all eleven are installed, run verification without replaying migrations. SQL migration files are one-time changes and must not be replayed over their own tables/functions. Take a database backup before updating an existing deployment.
+If you previously ran only the first six migrations, start at number 7. If you have nine migrations, apply 10–12. If you have ten, apply 11–12. If the first eleven are installed, apply only migration 12, then run `04_verify.sql`. If all twelve are installed, run verification without replaying migrations. Migration files are one-time changes. Preserve existing data and take a backup before updating.
 
-If you do not know which files were applied, review your SQL Editor history and run `04_verify.sql`. A verification error identifies a missing object or setting; it is not authorization to delete existing tables. Compare the migration contents with the existing database before choosing a starting point. Do not guess by running all eleven again.
+If you do not know which files were applied, review your SQL Editor history and run `04_verify.sql`. A verification error identifies a missing object or setting; it is not authorization to delete existing tables. Compare the migration contents with the existing database before choosing a starting point. Do not guess by running all twelve again.
 
 For installations managed by the Supabase CLI, keep using the repository's `supabase/migrations/` folder and its tracked migration history. Use `supabase migration list` and the normal `supabase db push` workflow after linking the correct project. This download also includes those same migration files.
 

@@ -1,6 +1,6 @@
 # SummitWar — Supabase setup
 
-This package installs the database for the features currently implemented in SummitWar: eight-founder tournaments, 24/24/12-hour voting rounds, a 12-hour winner spotlight, pre-entry, single-use guest voting links, visitor counts, winner startup pages, feedback, saves, in-app reminders, payment/refund records and six paid sponsor cards opening at $100 each. Takeovers require at least $1 more than the current sponsor paid per card; buyers can bid higher. Tournament entry is always free.
+This package installs the database for the features currently implemented in SummitWar: eight-founder tournaments, 24/24/12-hour voting rounds, a 12-hour winner spotlight, pre-entry, single-use network-bound voting links, one guest vote per network/match with GitHub verification for additional shared-network voters, visitor counts, winner startup pages, feedback, saves, in-app reminders, payment/refund records and six paid sponsor cards opening at $100 each. Takeovers require at least $1 more than the current sponsor paid per card; buyers can bid higher. Tournament entry is always free.
 
 This release matches the features already implemented in the website. Additional growth features can be added with later migrations.
 
@@ -8,7 +8,7 @@ This release matches the features already implemented in the website. Additional
 
 For a **new, dedicated Supabase project**, open **SQL Editor → New query**, paste the entire contents of `01_install.sql`, and click **Run**. Run it as the project database owner (the SQL Editor's default `postgres` role).
 
-The installer includes all eleven project migrations, in order, in one transaction. It refuses to run if the public schema already contains application tables. It does not reset or delete an existing database. No sample founders, votes, winners or paid ads are inserted.
+The installer includes all twelve project migrations, in order, in one transaction. It refuses to run if the public schema already contains application tables. It does not reset or delete an existing database. No sample founders, votes, winners or paid ads are inserted.
 
 Next, run `02_storage.sql` in a separate SQL Editor query. It creates the public `product-media` bucket for screenshots and demos. Uploads use the protected app server; this file adds only a browser read policy. Images are limited to 5 MB by the app and demo videos to 30 MB.
 

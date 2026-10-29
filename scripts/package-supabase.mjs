@@ -17,7 +17,7 @@ const functions=[...new Set(sources.flatMap(({sql})=>[
 const readonly=['products','tournaments','entries','matches','feedback','champions','promotion_tasks'];
 const preflight=`do $$
 begin
- if to_regclass('auth.users') is null or to_regprocedure('auth.uid()') is null or (select count(*) from pg_roles where rolname in('anon','authenticated','service_role'))<>3 then
+ if to_regclass('auth.users') is null or to_regclass('auth.identities') is null or to_regprocedure('auth.uid()') is null or (select count(*) from pg_roles where rolname in('anon','authenticated','service_role'))<>3 then
   raise exception 'Run this installer in a Supabase project using its SQL Editor as postgres.';
  end if;
  if exists(select 1 from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relkind in('r','p') and not exists(select 1 from pg_depend d where d.classid='pg_class'::regclass and d.objid=c.oid and d.deptype='e')) then
@@ -58,6 +58,8 @@ begin
  end loop;
  if not(select rolbypassrls from pg_roles where rolname='service_role') then raise exception 'Supabase service_role must have its platform BYPASSRLS capability';end if;
  if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='votes' and column_name='voter_hash') or not exists(select 1 from information_schema.columns where table_schema='public' and table_name='votes' and column_name='user_id' and is_nullable='YES') then raise exception 'Guest voting migration is missing';end if;
+ if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='voting_links' and column_name='network_hash') or not exists(select 1 from pg_indexes where schemaname='public' and indexname='one_github_vote') then raise exception 'Network-bound and GitHub voting protection is missing';end if;
+ if not has_column_privilege('service_role','auth.identities','provider_id','SELECT') or not has_column_privilege('service_role','auth.identities','provider','SELECT') or not has_column_privilege('service_role','auth.identities','user_id','SELECT') then raise exception 'Server GitHub identity lookup permissions are missing';end if;
  if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='promotion_orders' and column_name='pricing_version' and column_default='4') then raise exception 'Promotion bid pricing version 4 default is missing';end if;
  if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='promotion_orders' and column_name='slot_amounts') or not exists(select 1 from pg_trigger where tgrelid='public.promotion_orders'::regclass and tgname='immutable_promotion_bid' and tgenabled='O') then raise exception 'Immutable per-card sponsor bids are missing';end if;
  if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='tournaments' and column_name='extended_cycle' and column_default='true') then raise exception '24/24/12-hour tournament schedule default is missing';end if;

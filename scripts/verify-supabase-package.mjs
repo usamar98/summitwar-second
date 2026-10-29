@@ -17,6 +17,7 @@ const checks=[];
 try{
  await sql.exec(`create schema auth;create role anon;create role authenticated;create role service_role bypassrls;
  create table auth.users(id uuid primary key,email_confirmed_at timestamptz,raw_app_meta_data jsonb default '{}',created_at timestamptz default now()-interval '2 days');
+ create table auth.identities(user_id uuid references auth.users(id),provider text,provider_id text,unique(provider,provider_id));
  create function auth.uid() returns uuid language sql as 'select null::uuid';
  create schema storage;create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
  create table storage.objects(id uuid primary key default gen_random_uuid(),bucket_id text references storage.buckets(id),name text);
@@ -31,7 +32,7 @@ try{
  checks.push('repeat installation refuses safely and preserves existing tables/counter');
  await sql.exec(read('02_storage.sql'));await sql.exec(read('02_storage.sql'));
  assert.equal((await q("select count(*)::int n from pg_policies where schemaname='storage' and policyname='Public product media reads'"))[0].n,1);
- await sql.exec(read('04_verify.sql'));checks.push('33 tables, RLS, private permissions, 41 command names, current prices and media configuration verified');
+ await sql.exec(read('04_verify.sql'));checks.push('34 tables, RLS, private permissions, 44 command names, current prices and media configuration verified');
  await sql.exec('grant select on public.votes to anon');
  await rejected(read('04_verify.sql'),/Private table votes is readable by anon/);await sql.exec('revoke select on public.votes from anon');
  await sql.exec('alter table public.promotion_orders disable row level security');

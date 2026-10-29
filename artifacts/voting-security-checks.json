@@ -1,0 +1,39 @@
+{
+  "passed": true,
+  "policy": "One guest vote per network per match; additional voters verify with GitHub without email sign-in",
+  "validation": {
+    "fullSuite": {"passed": 159, "failed": 0, "files": 30},
+    "finalDatabaseSuite": {"passed": 10, "failed": 0, "includesAdditionalRetentionTest": true},
+    "distinctTestsPassed": 160,
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "freshDatabaseInstaller": "12 migrations, 34 private application tables, 44 server command names verified",
+    "localVoterScreen": "GitHub button present, zero email inputs, no horizontal overflow"
+  },
+  "hostedDatabase": {
+    "project": "summitwarsecond",
+    "migration": "harden_guest_voting",
+    "applied": true,
+    "privateNetworkClaimsRls": true,
+    "uniqueGithubIdentityPerMatch": true,
+    "networkBoundLinks": true,
+    "serverIdentityLookupVerified": true,
+    "authEmailAndIdentityDataNotGranted": true,
+    "browserRolesCannotCallIdentityOrQuotaCommands": true,
+    "productionVotesCreated": 0
+  },
+  "checks": [
+    "Two guest browsers holding links for the same network cannot both cast a ballot",
+    "Different GitHub identities can vote on shared Wi-Fi; the same identity cannot repeat across browsers or networks",
+    "Email accounts, optional X handles and account metadata do not satisfy GitHub verification",
+    "A GitHub vote also consumes that network's guest allowance",
+    "Network/account changes require a fresh link; used and expired links cannot vote",
+    "Vote invalidation and old network-hash cleanup do not restore the active match allowance",
+    "Vercel address headers are required in production; arbitrary proxy headers cannot choose the network",
+    "IPv6 privacy addresses within one /64 and IPv4-mapped addresses normalize consistently",
+    "Failed challenge and ballot attempts consume independent persistent request quotas",
+    "GitHub return paths are restricted to internal match URLs and preserve the existing OAuth callback URL"
+  ],
+  "scope": "PostgreSQL behavior tested in isolated PGlite fixtures; API/OAuth handlers use mocks. Production checks were read-only after the schema migration. No live test votes, tournaments, payments or accounts were created. Independent hosted connection races were not exercised.",
+  "limits": "IP networks and GitHub identities do not prove unique people. VPNs, different networks, multiple GitHub accounts, or a person switching between anonymous and authenticated identities can evade some duplication checks. Shared-network voters may need GitHub and are subject to network request quotas."
+}

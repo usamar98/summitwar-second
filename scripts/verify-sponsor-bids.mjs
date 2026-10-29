@@ -9,6 +9,7 @@ const checks=[];
 try{
  await sql.exec(`create schema auth;create role anon;create role authenticated;create role service_role;
  create table auth.users(id uuid primary key,email_confirmed_at timestamptz,raw_app_meta_data jsonb default '{}',created_at timestamptz default now()-interval '2 days');
+ create table auth.identities(user_id uuid references auth.users(id),provider text,provider_id text,unique(provider,provider_id));
  create function auth.uid() returns uuid language sql as 'select null::uuid';`);
  const files=fs.readdirSync('supabase/migrations').filter(f=>f.endsWith('.sql')).sort();
  for(const file of files)await sql.exec(fs.readFileSync('supabase/migrations/'+file,'utf8').replace('create extension if not exists pgcrypto;',''));

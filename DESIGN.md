@@ -15,3 +15,5 @@ Show the rewards comparison directly below the tournament and before the partici
 Sponsor booking shows the current per-card paid amount, the minimum bid and a native currency input for a custom higher bid. Empty cards open at $100; occupied cards require at least $1 more than the current amount. Keep a clear combined total for multiple-card purchases and explain the reset before each new tournament.
 
 The demo retains the production hero and bracket layout. A labelled demo control strip offers local takeover and next-tournament previews. Below the rewards comparison, show a sample permanent winner page beside its badge, private report and sample social post, followed by an example sponsor placement with its included benefits. Keep sample and organizer-provided content explicit.
+
+Voting copy states the guest network allowance before confirmation. The shared-Wi-Fi fallback opens a GitHub-only voter verification page and returns to the match. A typed X handle remains an unverified display label. Network/account changes ask for a fresh link; rate limits show a retry message.

@@ -1,12 +1,12 @@
 {
   "passed": true,
-  "migrations": 11,
-  "protectedTables": 33,
-  "serverCommandNames": 41,
+  "migrations": 12,
+  "protectedTables": 34,
+  "serverCommandNames": 44,
   "checks": [
     "complete fresh installer applies all current migrations atomically",
     "repeat installation refuses safely and preserves existing tables/counter",
-    "33 tables, RLS, private permissions, 41 command names, current prices and media configuration verified",
+    "34 tables, RLS, private permissions, 44 command names, current prices and media configuration verified",
     "verification catches exposed votes and disabled sponsor-order RLS",
     "admin assignment requires a real existing user and is idempotent",
     "organizer publishes the first free edition, approves eight founders, protects entry uniqueness and starts 24-hour quarterfinals",

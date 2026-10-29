@@ -1,0 +1,14 @@
+import {beforeEach,afterEach,it,expect,vi} from 'vitest';
+const mock=vi.hoisted(()=>({values:new Map<string,string>(),set:vi.fn(),remove:vi.fn(),oauth:vi.fn(),exchange:vi.fn()}));
+vi.mock('next/headers',()=>({cookies:async()=>({get:(name:string)=>({value:mock.values.get(name)}),set:mock.set,delete:mock.remove})}));
+vi.mock('../src/lib/supabase',()=>({auth:async()=>({auth:{signInWithOAuth:mock.oauth,exchangeCodeForSession:mock.exchange}})}));
+import {POST} from '../src/app/api/auth/route';
+import {GET} from '../src/app/auth/callback/route';
+import {AUTH_RETURN_COOKIE} from '../src/lib/auth-return';
+const next='/matches/10000000-0000-4000-8000-000000000001';
+beforeEach(()=>{vi.clearAllMocks();mock.values.clear();mock.oauth.mockResolvedValue({data:{url:'https://github.com/login/oauth/authorize?example'},error:null});mock.exchange.mockResolvedValue({error:null});vi.stubEnv('NODE_ENV','production');vi.stubEnv('NEXT_PUBLIC_APP_URL','https://summitwar.example')});
+afterEach(()=>vi.unstubAllEnvs());
+it('uses the existing approved callback URL and keeps a short-lived private match return cookie',async()=>{const response=await POST(new Request('https://summitwar.example/api/auth',{method:'POST',headers:{origin:'https://summitwar.example','content-type':'application/json'},body:JSON.stringify({provider:'github',next})}));expect(response.status).toBe(200);expect(mock.oauth).toHaveBeenCalledWith({provider:'github',options:{redirectTo:'https://summitwar.example/auth/callback'}});expect(mock.set).toHaveBeenCalledWith(AUTH_RETURN_COOKIE,next,expect.objectContaining({httpOnly:true,secure:true,sameSite:'lax',maxAge:600}))});
+it('returns to the match after verification and deletes its return cookie',async()=>{mock.values.set(AUTH_RETURN_COOKIE,next);const response=await GET(new Request('https://summitwar.example/auth/callback?code=fixture-code'));expect(response.headers.get('location')).toBe('https://summitwar.example'+next);expect(mock.remove).toHaveBeenCalledWith(AUTH_RETURN_COOKIE)});
+it('never redirects authentication to a client-supplied external URL',async()=>{mock.values.set(AUTH_RETURN_COOKIE,'//evil.example');const response=await GET(new Request('https://summitwar.example/auth/callback?code=fixture-code'));expect(response.headers.get('location')).toBe('https://summitwar.example/dashboard')});
+it('keeps failed verification in the email-free voter flow without copying OAuth codes',async()=>{mock.values.set(AUTH_RETURN_COOKIE,next);mock.exchange.mockResolvedValue({error:{message:'Fixture failure'}});const response=await GET(new Request('https://summitwar.example/auth/callback?code=fixture-code'));const location=response.headers.get('location')!;expect(location).toContain('/login?mode=vote&next=');expect(location).not.toContain('fixture-code')});

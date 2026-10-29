@@ -1,0 +1,3 @@
+import {it,expect} from 'vitest';
+import {safeAuthReturn,votingLoginPath} from '../src/lib/auth-return';
+it('returns only to a known internal match after GitHub verification',()=>{const path='/matches/10000000-0000-4000-8000-000000000001';expect(safeAuthReturn(path)).toBe(path);expect(votingLoginPath(path.split('/').at(-1)!)).toContain(encodeURIComponent(path));for(const input of [null,undefined,'https://evil.example','//evil.example','/\\evil.example','/%2f%2fevil.example','/matches/not-a-uuid','/matches/10000000-0000-4000-8000-000000000001?next=//evil.example'])expect(safeAuthReturn(input)).toBe('/dashboard')});
