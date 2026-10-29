@@ -32,7 +32,7 @@ try{
  checks.push('repeat installation refuses safely and preserves existing tables/counter');
  await sql.exec(read('02_storage.sql'));await sql.exec(read('02_storage.sql'));
  assert.equal((await q("select count(*)::int n from pg_policies where schemaname='storage' and policyname='Public product media reads'"))[0].n,1);
- await sql.exec(read('04_verify.sql'));checks.push('34 tables, RLS, private permissions, 44 command names, current prices and media configuration verified');
+ await sql.exec(read('04_verify.sql'));checks.push('34 tables, RLS, private permissions, 51 command names, current prices and media configuration verified');
  await sql.exec('grant select on public.votes to anon');
  await rejected(read('04_verify.sql'),/Private table votes is readable by anon/);await sql.exec('revoke select on public.votes from anon');
  await sql.exec('alter table public.promotion_orders disable row level security');
@@ -42,7 +42,7 @@ try{
  await rejected(read('03_admin.sql'),/Replace PASTE_YOUR_AUTH_USER_UUID_HERE/);
  const admin=randomUUID(),adminFile=read('03_admin.sql').replace("'PASTE_YOUR_AUTH_USER_UUID_HERE'",`'${admin}'`);
  await rejected(adminFile,/Auth user does not exist/);
- const authUser=async id=>q("insert into auth.users(id,raw_app_meta_data) values($1,'{\"provider\":\"github\",\"providers\":[\"github\"]}')",[id]);
+ const authUser=async id=>{await q("insert into auth.users(id,raw_app_meta_data) values($1,'{\"provider\":\"github\",\"providers\":[\"github\"]}')",[id]);await q("insert into auth.identities(user_id,provider,provider_id) values($1,'github',$2)",[id,'fixture-'+id])};
  await authUser(admin);await sql.exec(adminFile);await sql.exec(adminFile);
  assert.equal((await q('select count(*)::int n from admin_roles'))[0].n,1);checks.push('admin assignment requires a real existing user and is idempotent');
  const command=async(action,target=null,data={})=>(await q('select admin_command($1,$2,$3,$4) result',[admin,action,target,data]))[0].result;
@@ -68,11 +68,11 @@ try{
  await assert.rejects(q("select cast_guest_vote($1,$2,$3,$4,$5,'test_builder')",[m.id,m.entry_b,voter,token,network]));
  assert.equal((await q('select count(*)::int n from votes where match_id=$1',[m.id]))[0].n,1);
  assert.ok((await q('select used_at from voting_links where match_id=$1',[m.id]))[0].used_at);checks.push('guest voting records one final vote and consumes its single-use link without an email account');
- const order=randomUUID();await q('select reserve_promotion($1,$2,$3,$4,$5,$6)',[admin,t.id,[1,2,3,4,5,6],order,{name:'Fixture sponsor',url:'https://example.org',tagline:'Fixture placement',logo_url:'https://example.org/favicon.ico'},{1:10000,2:10000,3:10000,4:10000,5:10000,6:10000}]);
- const booking=(await q('select amount,pricing_version from promotion_orders where id=$1',[order]))[0];assert.deepEqual(booking,{amount:60000,pricing_version:4});
+ const order=randomUUID();await q('select reserve_promotion($1,$2,$3,$4,$5,null,$6)',[admin,t.id,[1,2,3,4,5,6],order,{name:'Fixture sponsor',url:'https://example.org',tagline:'Fixture placement',logo_url:'https://example.org/favicon.ico'},'quarterfinal']);
+ const booking=(await q('select amount,pricing_version from promotion_orders where id=$1',[order]))[0];assert.deepEqual(booking,{amount:60000,pricing_version:5});
  await assert.rejects(q('select reserve_promotion($1,$2,$3,$4,$5)',[entrants[0],t.id,[1],randomUUID(),{name:'Other fixture',url:'https://example.net',tagline:'Fixture'}]));
  assert.equal((await q("select fulfill_promotion('fixture-event','checkout.session.completed',$1,'fixture-checkout','fixture-intent',60000,'usd') result",[order]))[0].result,'paid');
- assert.ok((await q('select promotion_inventory($1) result',[t.id]))[0].result.every(s=>s.state==='paid'));checks.push('all six sponsor cards cost $600, reserve one checkout at a time and publish only after verified payment fulfillment');
+ assert.ok((await q('select promotion_inventory($1) result',[t.id]))[0].result.every(s=>s.state==='paid'));checks.push('all six quarterfinal plans cost $600, reserve exclusively and publish protected cards only after verified payment fulfillment');
  for(const role of ['anon','authenticated']){
   await sql.exec(`set role ${role}`);await assert.rejects(q('select * from promotion_orders'),/permission denied/);await assert.rejects(q('select * from voting_links'),/permission denied/);
   await assert.rejects(q('select tick()'),/permission denied/);await assert.rejects(q("insert into storage.objects(bucket_id,name) values('product-media','blocked.png')"),/row-level security/);await sql.exec('reset role');

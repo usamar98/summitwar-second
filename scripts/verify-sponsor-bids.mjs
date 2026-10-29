@@ -11,7 +11,7 @@ try{
  create table auth.users(id uuid primary key,email_confirmed_at timestamptz,raw_app_meta_data jsonb default '{}',created_at timestamptz default now()-interval '2 days');
  create table auth.identities(user_id uuid references auth.users(id),provider text,provider_id text,unique(provider,provider_id));
  create function auth.uid() returns uuid language sql as 'select null::uuid';`);
- const files=fs.readdirSync('supabase/migrations').filter(f=>f.endsWith('.sql')).sort();
+ const files=fs.readdirSync('supabase/migrations').filter(f=>f.endsWith('.sql')&&f<='20261029132229_harden_guest_voting.sql').sort();
  for(const file of files)await sql.exec(fs.readFileSync('supabase/migrations/'+file,'utf8').replace('create extension if not exists pgcrypto;',''));
  async function actor(){const id=randomUUID();await q('insert into auth.users(id,email_confirmed_at) values($1,now())',[id]);return id}
  let editionNumber=0;

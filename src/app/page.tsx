@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import {TournamentRewards} from '@/components/tournament-rewards';
 import {PromotionHero} from '@/components/promotion-hero';
-import {promotionInventory,promotionEnd} from '@/lib/promotions';
+import {promotionInventory,promotionEnd,promotionTournament} from '@/lib/promotions';
 import {stripeCheckoutReady} from '@/lib/stripe-client';
 import {votedMatches} from '@/lib/guest-voter';
 import {TournamentWatch} from '@/components/tournament-watch';
@@ -14,15 +14,16 @@ import {Bracket,ProductCard} from '@/components/ui';
 import {LocalTime,LiveRefresh} from '@/components/widgets';
 export const dynamic='force-dynamic';
 export default async function Home(){
- const [{tournament:t,entries,matches,champion},u]=await Promise.all([tournamentData(),user()]);
+ const [{tournament:t,entries,matches,champion},u,sponsorTournament]=await Promise.all([tournamentData(),user(),promotionTournament()]);
  const [seats,scores]=await Promise.all([t?availability(t.id):null,matchScores(matches)]);
  const votes=await votedMatches(matches.map(m=>m.id),u?.id);
  const [follows,saved]=u?await Promise.all([db().from('product_follows').select('product_id').eq('user_id',u.id),db().from('saved_products').select('product_id').eq('user_id',u.id)]):[{data:[]},{data:[]}];
  const live=t?.status==='voting';const spotlight=champion&&Date.parse(champion.spotlight_ends)>Date.now()&&!live;let winner=null;
  if(champion&&configured()){const {data}=await db().from('entries').select('snapshot').eq('id',champion.entry_id).single();winner=data?.snapshot;}
- const [promotions,promotionEnds]=await Promise.all([promotionInventory(t?.id),promotionEnd(t?.id)]);
+ const [promotions,promotionEnds]=await Promise.all([promotionInventory(sponsorTournament?.id),promotionEnd(sponsorTournament?.id)]);
  return <>{preview&&<div className="preview-banner">LOCAL PREVIEW · No real entrants, votes, or payments are simulated.</div>}<LiveRefresh tournament={t?.id}/>
- <PromotionHero winner={winner} championId={champion?.tournament_id} tournament={t?.id} edition={t?.edition} slots={promotions} ends={promotionEnds} serverNow={new Date().toISOString()} signedIn={Boolean(u)} checkoutEnabled={Boolean(t&&promotionEnds&&stripeCheckoutReady())}/>
+ {sponsorTournament&&sponsorTournament.id!==t?.id&&<LiveRefresh tournament={sponsorTournament.id}/>}
+ <PromotionHero winner={winner} championId={champion?.tournament_id} tournament={sponsorTournament?.id} edition={sponsorTournament?.edition} slots={promotions} ends={promotionEnds} serverNow={new Date().toISOString()} signedIn={Boolean(u)} checkoutEnabled={Boolean(sponsorTournament&&stripeCheckoutReady())}/>
  <section className="section arena tournament-first" id="arena">
   <div className="section-head"><div><p className="eyebrow"><span className="status-dot"/>{t?`EDITION ${String(t.edition).padStart(3,'0')} · ${t.status.toUpperCase()}`:'THE INAUGURAL EDITION'}</p><h2 className="tournament-title">{live?'The climb is on.':spotlight?`${winner?.name||'The champion'} rules the summit.`:'The next summit is yours.'}</h2></div><Link className="button" href={t&&['locked','voting','spotlight'].includes(t.status)?'#next-tournament':'/submit'}>{t&&['locked','voting','spotlight'].includes(t.status)?'Pre-enter next tournament':'Enter free'}<ArrowTopRightIcon/></Link></div>
   <div className="arena-top"><div><span className="tag">{t?.theme||'Tools for people who build apps'}</span><p>{live?'Choose the app you would actually use. One final choice per match.':spotlight?'Chosen by the community. 12 hours at the top.':'Eight founders. One app each. Pick an open place and submit your website.'}</p><p className="muted">Entering, watching and voting are always free.</p>{t&&<p className="muted">Voting starts <LocalTime value={t.starts_at}/></p>}</div><TournamentWatch tournament={t} matches={matches} serverNow={new Date().toISOString()} spotlightEnd={spotlight?champion.spotlight_ends:undefined}/></div>

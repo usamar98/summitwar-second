@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "plansUsdPerCard": {"quarterfinal": 100, "semifinal": 200, "tournament": 300},
+  "rules": [
+    "A paid sponsor cannot be replaced during its purchased protection period",
+    "Quarterfinal and semifinal plans release only after every result in their round is finalized",
+    "Whole-tournament coverage includes the final and winner spotlight and follows the next tournament start, including postponements",
+    "Whole-tournament coverage remains protected if a successor has not been published yet",
+    "Expired cards can be booked for a remaining period at fixed prices, without bidding",
+    "Immutable plan and per-card amounts determine the verified Stripe checkout total",
+    "Stale, overlapping or late payments cannot displace a protected sponsor and are queued for refund"
+  ],
+  "validation": {
+    "fullSuitePassed": 173,
+    "fullSuiteFiles": 31,
+    "finalDatabaseSuitePassed": 10,
+    "distinctTestsPassed": 174,
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "freshInstaller": "13 migrations, 34 tables and 51 private server command names verified",
+    "serverRole": "Reservation and fulfillment exercised using service_role, including minimal founder-confirmation permission",
+    "hostedDatabase": "Migration applied; full read-only verifier, prices and private permissions passed",
+    "browser": [
+      "Three native protection choices render without a custom number input or nested fieldset border",
+      "Selecting whole-tournament coverage updates the one-card total to $300",
+      "Protected demo cards open read-only details with no replacement form",
+      "Quarterfinal results release exactly two $100 demo cards, leaving four protected",
+      "Semifinal results leave only the two $300 demo cards protected",
+      "The next tournament clears every old demo sponsor and reopens all six cards"
+    ]
+  },
+  "scope": "SQL and payment edge cases use isolated PGlite fixtures and mocked Stripe calls. Hosted checks after migration were read-only. Browser previews change local demo state only. No real Stripe payments, refunds or sponsor orders were created. Independent hosted connection races were not exercised."
+}

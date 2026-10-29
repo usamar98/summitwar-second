@@ -1,17 +1,17 @@
 {
   "passed": true,
-  "migrations": 12,
+  "migrations": 13,
   "protectedTables": 34,
-  "serverCommandNames": 44,
+  "serverCommandNames": 51,
   "checks": [
     "complete fresh installer applies all current migrations atomically",
     "repeat installation refuses safely and preserves existing tables/counter",
-    "34 tables, RLS, private permissions, 44 command names, current prices and media configuration verified",
+    "34 tables, RLS, private permissions, 51 command names, current prices and media configuration verified",
     "verification catches exposed votes and disabled sponsor-order RLS",
     "admin assignment requires a real existing user and is idempotent",
     "organizer publishes the first free edition, approves eight founders, protects entry uniqueness and starts 24-hour quarterfinals",
     "guest voting records one final vote and consumes its single-use link without an email account",
-    "all six sponsor cards cost $600, reserve one checkout at a time and publish only after verified payment fulfillment",
+    "all six quarterfinal plans cost $600, reserve exclusively and publish protected cards only after verified payment fulfillment",
     "browser roles cannot read private records, run privileged commands or upload media; service role retains access",
     "scheduler rejects missing/local settings and registers two repeat-safe jobs; stored SQL executes against simulated Cron/Vault/HTTP APIs"
   ],

@@ -24,7 +24,7 @@ export function DemoPreview({projects,entries,matches,children}:{projects:Produc
   const anchor=event.target.closest('a');
   if(anchor){
    const url=new URL(anchor.href,location.href);
-   if(url.pathname==='/promote'){event.preventDefault();event.stopPropagation();setDetail({key:'sample-sponsors',title:'Six sample sponsor places',body:'Empty cards start at $100. Takeovers start at $1 more than the current per-card bid, with higher bids allowed. All sponsor cards reset before the next tournament. This preview shows all six filled. Visit the live tournament to book a real placement.'});return}
+   if(url.pathname==='/promote'){event.preventDefault();event.stopPropagation();setDetail({key:'sample-sponsors',title:'Six sample sponsor places',body:'Fixed plans protect a card through quarterfinal results ($100), semifinal results ($200), or the next tournament start ($300). Nobody can replace a sponsor during that period. Use the demo controls to release shorter plans and preview a new placement. Visit the live tournament to make a real booking.'});return}
    let product=projects.find(project=>url.pathname===`/products/${project.slug}`||url.pathname===`/api/outbound/${project.id}`||url.href===project.url||url.href===`${project.url}/`);
    if(url.pathname==='/champions/demo-edition-001'||url.pathname===`/products/${projects[0].slug}`){event.preventDefault();event.stopPropagation();document.getElementById('demo-winner-benefits')?.scrollIntoView({block:'start'});return}
    const match=matches.find(match=>url.pathname===`/matches/${match.id}`);

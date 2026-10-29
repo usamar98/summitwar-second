@@ -1,5 +1,5 @@
 import type {Entry,Match,Product,Tournament} from './types';
-import {PROMOTION_SLOTS,type PromotionSlot} from './promotion-slots';
+import {PROMOTION_SLOTS,PROMOTION_PLANS,type PromotionSlot,type PromotionPlan} from './promotion-slots';
 
 function logo(letter:string,color:string){
  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96"><rect width="96" height="96" rx="24" fill="${color}"/><path d="M68 15 81 28M15 68 28 81" stroke="#15201a" stroke-opacity=".2" stroke-width="5" stroke-linecap="round"/><text x="48" y="63" text-anchor="middle" font-family="Arial,sans-serif" font-size="48" font-weight="700" fill="#15201a">${letter}</text></svg>`;
@@ -46,8 +46,8 @@ export function completedDemo(now=Date.now()){
  }
  const matches=[match('quarterfinal-1',1,1,1,2,412,286),match('quarterfinal-2',1,2,3,4,354,312),match('quarterfinal-3',1,3,5,6,298,342),match('quarterfinal-4',1,4,7,8,361,337),match('semifinal-1',2,1,1,3,522,418),match('semifinal-2',2,2,6,7,407,463),match('final',3,1,1,7,684,526)];
  const scores=Object.fromEntries(matches.map(match=>[match.id,{a:match.score_a!,b:match.score_b!}]));
- const amounts=[10000,17500,25050,45000,12500,31000];
- const slots:PromotionSlot[]=PROMOTION_SLOTS.map((slot,index)=>({...slot,price:amounts[index]+100,minimum_bid:amounts[index]+100,current_amount:amounts[index],state:'paid',bookable:true,name:sponsors[index].name,url:sponsors[index].url,tagline:sponsors[index].tagline,logo_url:sponsors[index].logo_url}));
+ const plans:PromotionPlan[]=['quarterfinal','semifinal','tournament','tournament','semifinal','quarterfinal'];
+ const slots:PromotionSlot[]=PROMOTION_SLOTS.map((slot,index)=>({...slot,price:10000,available_plans:[...PROMOTION_PLANS],current_amount:PROMOTION_PLANS.find(p=>p.id===plans[index])!.price,placement_plan:plans[index],state:'paid',bookable:false,name:sponsors[index].name,url:sponsors[index].url,tagline:sponsors[index].tagline,logo_url:sponsors[index].logo_url}));
  const replacement=project('Launchlane','A clearer path from your first idea to launch.','#a4d9e6','Launch tools','Demo sponsor');
  return {tournament,entries,matches,scores,slots,sponsors,replacement,winner:entrants[0],projects:[...entrants,...sponsors,replacement],spotlightEnd:iso(finalEnd+12*3600000),serverNow:iso(now)};
 }

@@ -1,6 +1,6 @@
 # SummitWar — Supabase setup
 
-This package installs the database for the features currently implemented in SummitWar: eight-founder tournaments, 24/24/12-hour voting rounds, a 12-hour winner spotlight, pre-entry, single-use network-bound voting links, one guest vote per network/match with GitHub verification for additional shared-network voters, visitor counts, winner startup pages, feedback, saves, in-app reminders, payment/refund records and six paid sponsor cards opening at $100 each. Takeovers require at least $1 more than the current sponsor paid per card; buyers can bid higher. Tournament entry is always free.
+This package installs SummitWar’s eight-founder tournaments, 24/24/12-hour rounds, winner spotlight, pre-entry, protected guest voting, GitHub shared-network verification, analytics, founder tools and paid sponsorships. Sponsor cards cost $100 through quarterfinal results, $200 through semifinal results, or $300 until the next tournament starts. Paid cards cannot be replaced during their chosen period. Tournament entry is always free.
 
 This release matches the features already implemented in the website. Additional growth features can be added with later migrations.
 
@@ -8,7 +8,7 @@ This release matches the features already implemented in the website. Additional
 
 For a **new, dedicated Supabase project**, open **SQL Editor → New query**, paste the entire contents of `01_install.sql`, and click **Run**. Run it as the project database owner (the SQL Editor's default `postgres` role).
 
-The installer includes all twelve project migrations, in order, in one transaction. It refuses to run if the public schema already contains application tables. It does not reset or delete an existing database. No sample founders, votes, winners or paid ads are inserted.
+The installer includes all thirteen project migrations, in order, in one transaction. It refuses to run if the public schema already contains application tables. It does not reset or delete an existing database. No sample founders, votes, winners or paid ads are inserted.
 
 Next, run `02_storage.sql` in a separate SQL Editor query. It creates the public `product-media` bucket for screenshots and demos. Uploads use the protected app server; this file adds only a browser read policy. Images are limited to 5 MB by the app and demo videos to 30 MB.
 
@@ -50,7 +50,7 @@ In the Supabase Dashboard, review the database Security and Performance Advisors
 
 For guest voting, configure Cloudflare Turnstile for your website domains, then set `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` and a stable random `VOTER_COOKIE_SECRET` of at least 32 characters. Set `VOTE_RISK_SALT` to another stable private random value. Voting does not create an email account. Browser identity and bot checks reduce repeat voting; they are not proof of one human per vote.
 
-For paid entries and sponsorships, set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`. Start with Stripe test keys. Configure a signed **snapshot** Stripe webhook at `https://YOUR-WEBSITE/api/stripe/webhook` for:
+For sponsorships, set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`. Start with Stripe test keys. Configure a signed **snapshot** Stripe webhook at `https://YOUR-WEBSITE/api/stripe/webhook` for:
 
 - `checkout.session.completed`
 - `checkout.session.async_payment_succeeded`
@@ -59,7 +59,7 @@ For paid entries and sponsorships, set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_S
 - `charge.dispute.created`
 - `payment_intent.payment_failed` (acknowledged without confirming an entry)
 
-Every competition edition is free. Empty sponsor cards open at $100 each, or $600 for all six. Occupied cards require at least $1 more than the current per-card payment, and buyers can choose higher bids. Immutable per-card amounts set the exact checkout total. A verified replacement payment overtakes only its selected cards; the current ad stays visible until then. Placements end when overtaken, at the edition's end or before the next tournament starts, whichever comes first. New cards reset to $100. Being overtaken is not refundable. Redirecting back from checkout does not confirm payment: the signed webhook does.
+Every competition edition is free. Sponsor plans cost exactly $100, $200 or $300 per card, through quarterfinal results, semifinal results or the next tournament start respectively. Nobody can replace a paid card during its purchased period. Short plans release only after all results in that round are finalized; remaining plans may then be purchased. New pricing version 5 derives amounts on the server and freezes the plan and per-card prices. The signed webhook verifies payment before publication; checkout redirects alone do not confirm payment.
 
 ## 6. Turn on automatic tournament updates
 

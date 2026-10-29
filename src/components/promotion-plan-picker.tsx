@@ -1,0 +1,6 @@
+'use client';
+import {PROMOTION_PLANS,promotionDollars,type PromotionPlan,type PromotionPlanOffer} from '@/lib/promotion-slots';
+import {LocalTime} from './widgets';
+export function PromotionPlanPicker({offers,selected,onChange,name='promotion-plan'}:{offers:readonly PromotionPlanOffer[];selected:PromotionPlan;onChange:(value:PromotionPlan)=>void;name?:string}){
+ return <fieldset className="promotion-plan-picker"><legend>Choose your protection period</legend><p className="muted">Fixed price per card. Nobody can replace your startup during this period.</p><div className="promotion-plan-options">{offers.map(offer=>{const plan=PROMOTION_PLANS.find(p=>p.id===offer.id)!;return <label className={`promotion-plan-option${selected===plan.id?' selected':''}`} key={plan.id}><input type="radio" name={name} value={plan.id} checked={selected===plan.id} onChange={()=>onChange(plan.id)}/><span><strong>{plan.label}</strong><small>{plan.description}</small>{offer.ends&&<small>Scheduled end: <LocalTime value={offer.ends}/></small>}</span><b>${promotionDollars(plan.price)}<small>per card</small></b></label>})}</div>{offers.length===0&&<p className="notice">Booking has closed for all protection periods in this tournament.</p>}</fieldset>;
+}
